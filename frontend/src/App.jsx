@@ -9,6 +9,8 @@ import Navbar from "./Components/Navbar";
 import Player from "./Components/Player";
 import Teams from "./Components/Teams";
 import TeamPage from "./Components/TeamPage";
+import Juries from "./Components/Juries";
+import PlayerPage from "./Components/PlayerPage";
 const App = () => {
   return (
     <div>
@@ -24,6 +26,8 @@ const App = () => {
         <Route path="/player" element={<Player/>} />
         <Route path="/teams" element={<Teams/>} />
         <Route path="/team/:id" element={<TeamPage />} />
+        <Route path="/juries" element={<Juries />} />
+        <Route path="/player/:id" element={<PlayerPage />} />
 
       </Routes>
     </Router>

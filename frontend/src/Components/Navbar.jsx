@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Logo from "../Assets/FTHBLogo.png";
+import Logo from "../Assets/logonav.jpg";
 import { Link } from "react-router-dom";
 import { FaRegWindowClose, FaBars } from "react-icons/fa";
 import Login from "./Login";
@@ -40,14 +40,15 @@ const Navbar = () => {
   );
 
   return (
-    <nav className="relative bg-black">
+    <nav className="relative">
       <div
-        className="h-20 flex justify-between z-50 text-red-500 lg:py-5 
-      lg:px-28 md:px-16 px-8 py-8"
+        className="h-22 flex justify-between z-50 text-red-500 lg:py-5 
+      lg:px-36 md:px-16 px-8 py-8"
       >
         <div className="flex items-center flex-1">
           <span>
-            <img src={Logo} alt="Logo" className="w-20" />
+            <Link to="/home">
+            <img src={Logo} alt="Logo" className="w-96" /></Link>
           </span>
         </div>
 

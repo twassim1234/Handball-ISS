@@ -1,4 +1,6 @@
 import pic1 from "../Assets/Teams/club.png";
+import pic2 from "../Assets/Teams/taraji.png";
+
 import { Link } from "react-router-dom";
 const teams = [
   {
@@ -15,7 +17,7 @@ const teams = [
     name: "Club",
     descreption: "anyek team fi tunis",
     href: "#",
-    imageSrc: pic1,
+    imageSrc: pic2,
     imageAlt: "Club",
   },
   {
@@ -57,14 +59,14 @@ export default function Teams() {
     <div className="bg-white py-12">
       <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
         <div className="lg:text-4xl md:text-4xl text-2xl font-bold text-red-500 flex justify-center pb-16 ">THE TEAMS OF THE LEAGUE</div>
-        <div className="grid grid-cols-1 gap-x-8 gap-y-20 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-12">
+        <div className="grid i grid-cols-1 gap-x-8 gap-y-20 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-12">
           {teams.map((teams) => (
             <a key={teams.id} href={teams.href} className="group">
               <Link to={`/team/${teams.id}`}>
                 <img
                   alt={teams.imageAlt}
                   src={teams.imageSrc}
-                  className="aspect-square w-full  h-fit rounded-lg bg-gray-200 object-cover group-hover:opacity-45 xl:aspect-6/8"
+                  className="max-w-fit px-12 max-h-fit rounded-lg object-cover group-hover:opacity-45 xl:aspect-6/8"
                 />
               </Link>
               <h2 className="mt-4 text-3xl flex justify-center font-bold text-red-500">
@@ -86,12 +88,14 @@ export default function Teams() {
           ))}
        
         </div>
+        <div className="flex justify-center items-center pt-16">
         <button
             type="button"
-            className="px-6 py-3 bg-red-500 text-white font-medium rounded-md hover:bg-red-600 transition duration-300"
+            className=" px-6 py-3 bg-red-500 text-white font-medium rounded-md hover:bg-red-800 "
           >
-            Contact US
+            Add a Team
           </button>
+          </div>
       </div>
     </div>
   );
