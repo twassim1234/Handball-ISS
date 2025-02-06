@@ -1,11 +1,11 @@
 import React from 'react'
 
-const Resgister = () => {
+const Player = () => {
   return (
     <div>
-      
+Player
     </div>
   )
 }
 
-export default Resgister
+export default Player

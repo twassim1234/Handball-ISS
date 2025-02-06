@@ -5,18 +5,26 @@ import Register from "./Components/Register";
 import Home from "./Components/Home";
 import Contact from "./Components/Contact";
 import About from "./Components/About";
+import Navbar from "./Components/Navbar";
+import Player from "./Components/Player";
+import Teams from "./Components/Teams";
+import TeamPage from "./Components/TeamPage";
 const App = () => {
   return (
     <div>
     <Router>
+    <Navbar />
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register/>} />
         <Route path="/forgot-password" element={<h1>Forgot Password Page</h1>} />
-        <Route path="/home" element={<Home/>} />
+        <Route path="/home" element={<Home />} />
         <Route path="/contact" element={<Contact/>} />
         <Route path="/about" element={<About/>} />
-        
+        <Route path="/player" element={<Player/>} />
+        <Route path="/teams" element={<Teams/>} />
+        <Route path="/team/:id" element={<TeamPage />} />
+
       </Routes>
     </Router>
     </div>
