@@ -93,7 +93,7 @@ export default function Teams() {
             type="button"
             className=" px-6 py-3 bg-red-500 text-white font-medium rounded-md hover:bg-red-800 "
           >
-            Add a Team
+            Modify
           </button>
           </div>
       </div>
