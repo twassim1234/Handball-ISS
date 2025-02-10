@@ -11,6 +11,7 @@ import Teams from "./Components/Teams";
 import TeamPage from "./Components/TeamPage";
 import Juries from "./Components/Juries";
 import PlayerPage from "./Components/PlayerPage";
+import Matches from "./Components/Matches/Matches";
 const App = () => {
   return (
     <div>
@@ -28,6 +29,7 @@ const App = () => {
         <Route path="/team/:id" element={<TeamPage />} />
         <Route path="/juries" element={<Juries />} />
         <Route path="/player/:id" element={<PlayerPage />} />
+        <Route path="/matches" element={<Matches />} />
 
       </Routes>
     </Router>
