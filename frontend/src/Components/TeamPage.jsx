@@ -104,12 +104,7 @@ const TeamPage = () => {
               onChange={handleTeamChange}
               className="mt-2 p-2 border rounded-md w-full"
             />
-            <button
-              className="mt-2 px-4 py-2 bg-green-500 text-white rounded-md"
-              onClick={() => setEditMode(false)}
-            >
-              Save Changes
-            </button>
+            
           </>
         ) : (
           <>
@@ -125,7 +120,7 @@ const TeamPage = () => {
             ← Back to Teams
           </Link>
           <button
-            className="px-4 py-2 bg-yellow-500 text-white rounded-md"
+            className="px-4 py-2 bg-red-500 text-white rounded-md"
             onClick={() => setEditMode(!editMode)}
           >
             {editMode ? "Cancel Edit" : "Edit Team"}
