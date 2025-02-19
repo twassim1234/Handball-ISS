@@ -19,7 +19,7 @@ const initialP = {
   height: "190",
   ref: "190b0",
   placeofbirth: "Tunis",
-  professional: "Yes",
+  qualification: "Yes",
 };
 
 const classNames = (...classes) => classes.filter(Boolean).join(" ");
@@ -130,6 +130,22 @@ export default function PlayerProfile() {
                 )}
               </div>
             ))}
+            <div className="pt-6">
+              <p className="text-2xl font-bold text-red-500">Qualification:</p>
+              {isEditing ? (
+                <select
+                  name="qualification"
+                  value={tempP.qualification}
+                  onChange={handleChange}
+                  className="text-xl font-bold border p-2 w-full"
+                >
+                  <option value="Yes">Yes</option>
+                  <option value="No">No</option>
+                </select>
+              ) : (
+                <p className="text-xl font-bold pt-2">{p.qualification}</p>
+              )}
+            </div>
 
             {isEditing ? (
               <button
@@ -202,7 +218,7 @@ export default function PlayerProfile() {
             onClick={() => setShowCertForm(!showCertForm)}
             className="mt-10 w-1/4 bg-red-500 text-white p-3 rounded hover:bg-red-700"
           >
-            Request Certification
+            Request Qualification
           </button>
 
           {showCertForm && (

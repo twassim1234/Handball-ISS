@@ -4,7 +4,7 @@ const Search = ({ onSearch }) => {
   const [search, setSearch] = useState("");
 
   return (
-    <div className="text-center py-4 bg-red-50">
+    <div className="text-center py-4 bg-gray-50">
       <input
         type="text"
         placeholder="Search ..."
