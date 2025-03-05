@@ -7,6 +7,7 @@ export default function Teams() {
   const [teams, setTeams] = useState([
     { id: 1, name: "Club", descreption: "best  team fi tunis", extrainfo: "extra info", href: "#", imageSrc: pic1, imageAlt: "Club" },
     { id: 2, name: "Club", descreption: "best team fi tunis", href: "#", imageSrc: pic2, imageAlt: "Club" },
+
   ]);
 
   const [isModifyMode, setIsModifyMode] = useState(false);
@@ -77,7 +78,7 @@ export default function Teams() {
           {teams.map((team) => (
             <div key={team.id} className="group">
               <Link to={`/team/${team.id}`}>
-                <img alt={team.imageAlt} src={team.imageSrc} className="max-w-fit px-12 max-h-fit rounded-lg object-cover group-hover:opacity-45 xl:aspect-6/8" />
+                <img alt={team.imageAlt} src={team.imageSrc} className="max-w-80 px-12 h-60 rounded-lg object-cover group-hover:opacity-45 " />
               </Link>
               <h2 className="mt-4 text-3xl flex justify-center font-bold text-red-500">{team.name}</h2>
               <p className="mt-1 text-lg flex justify-center font-medium text-gray-900">{team.descreption}</p>

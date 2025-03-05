@@ -40,9 +40,9 @@ const Footer = () => {
         <span className="text-sm">•</span>
         <a className="text-red-500 font-medium  text-md hover:underline focus:underline" href="/about">About</a>
         <span className="text-sm">•</span>
-        <a className="text-red-500 font-medium  text-md hover:underline focus:underline" href="#">Products</a>
+        <a className="text-red-500 font-medium  text-md hover:underline focus:underline" href="/contact">Contact us</a>
         <span className="text-sm">•</span>
-        <a className="text-red-500 font-medium  text-md hover:underline focus:underline" href="#">Terms of Services</a>
+        <a className="text-red-500 font-medium  text-md hover:underline focus:underline" href="/TermsAndConditions">Terms of Services</a>
         <span className="text-sm">•</span>
         <a className="text-red-500 font-medium  text-md hover:underline focus:underline" href="/privacy">Privacy Policy</a>
       </nav>

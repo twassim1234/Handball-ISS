@@ -4,6 +4,7 @@ import pic1 from "../Assets/Players/player11.png";
 import pic2 from "../Assets/Players/player12.jpg";
 import pic3 from "../Assets/Players/player13.jpg";
 import pic4 from "../Assets/Players/player14.jpg";
+import TermsAndConditions from "./TermsAndConditions";
 
 const initialP = {
   name: "Wassim Trabelsi",
@@ -50,6 +51,11 @@ export default function PlayerProfile() {
     files: [],
   });
 
+
+  // lel submit button
+  const [accepted, setAccepted] = useState(false);
+
+
   // Handle Input Change
   const handleChange = (e) => {
     setTempP({ ...tempP, [e.target.name]: e.target.value });
@@ -75,6 +81,9 @@ export default function PlayerProfile() {
     updatedArray[index] = value;
     setTempP({ ...tempP, [field]: updatedArray });
   };
+
+  const handleRequestClick = () => setIsMode(!isModifyMode);
+
 
   const handleAddItem = (field) => {
     setTempP({ ...tempP, [field]: [...tempP[field], ""] });
@@ -216,7 +225,7 @@ export default function PlayerProfile() {
         <div className="bg-white flex items-center justify-center p-6">
           <button
             onClick={() => setShowCertForm(!showCertForm)}
-            className="mt-10 w-1/4 bg-red-500 text-white p-3 rounded hover:bg-red-700"
+            className="flex mt-10 w-1/4 bg-red-500 text-white p-3 rounded hover:bg-red-700"
           >
             Request Qualification
           </button>
@@ -238,23 +247,62 @@ export default function PlayerProfile() {
                 placeholder="Email"
                 className="w-full p-2 border mb-2"
               />
-              <textarea
-                name="additionalInfo"
-                placeholder="Additional Information"
+              <input
+                type="number"
+                name="number"
+                placeholder="phone number"
                 className="w-full p-2 border mb-2"
               />
+              <label className="block font-medium mb-1">
+                Upload extrait de nessance:
+              </label>
               <input type="file" multiple className="w-full p-2 border mb-2" />
-              <button
-                type="submit"
-                onClick={() => setShowCertForm(false)}
-                className="bg-green-500 text-white p-2 rounded  hover:bg-green-700"
-              >
-                Submit
-              </button>
+
+              <label className="block font-medium mb-1">
+                Upload Autorisation parental:
+              </label>
+              <input type="file" multiple className="w-full p-2 border mb-2" />
+
+              <label className="block font-medium mb-1">
+                Upload CIN Scholaire:
+              </label>
+              <input type="file" multiple className="w-full p-2 border mb-2" />
+
+              <label className="block font-medium mb-1">Upload photo:</label>
+              <input type="file" multiple className="w-full p-2 border mb-2" />
+              <label className="block font-medium mb-1">
+                Upload Exstrait de payment:
+              </label>
+              <input type="file" multiple className="w-full p-2 border mb-2" />
+
+              <div className="flex items-start mb-3">
+        <input
+          type="checkbox"
+          id="terms"
+          className="mt-1 mr-2"
+          checked={accepted}
+          onChange={() => setAccepted(!accepted)}
+        />
+        <label htmlFor="terms" className="text-sm">
+          I agree to the <a href="/TermsAndConditions" className="text-blue-500 underline">terms and conditions</a>.
+        </label>
+      </div>
+
+
+
+
+      <button
+        className={`w-76 p-2 text-white rounded ${accepted ? "bg-blue-500 hover:bg-blue-600" : "bg-gray-400 cursor-not-allowed"}`}
+        disabled={!accepted}
+        onClick={() => setShowCertForm(false)}
+
+      >
+        Submit
+      </button>
               <button
                 type="button"
                 onClick={() => setShowCertForm(false)}
-                className="pl-2 bg-red-500 text-white p-2 rounded  hover:bg-red-700"
+                className=" w-76 pl-2 bg-red-500 text-white p-2 rounded  hover:bg-red-700"
               >
                 Cancel
               </button>

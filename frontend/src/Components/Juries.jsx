@@ -80,27 +80,15 @@ const TeamPage = () => {
               key={person.id}
               className="flex flex-col items-center bg-gray-100 p-4 rounded-lg shadow-md relative"
             >
-              <Link to={`/player/${person.id}`}>
                 <img
                   src={person.imageSrc}
                   alt={person.name}
                   className="w-fit h-60 size-96 rounded object-cover"
                 />
-              </Link>
               <h3 className="text-lg font-semibold text-gray-900 mt-2">
                 {person.name}
               </h3>
               <p className="text-sm text-indigo-600">{person.role}</p>
-              
-              {/* Show Remove Button Only in Edit Mode */}
-              {editMode && (
-                <button
-                  className="mt-2 px-3 py-1 bg-red-500 text-white rounded-md"
-                  onClick={() => removePlayer(person.id)}
-                >
-                  Remove
-                </button>
-              )}
             </li>
           ))}
         </ul>
