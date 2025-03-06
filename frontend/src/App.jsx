@@ -14,6 +14,7 @@ import PlayerPage from "./Components/PlayerPage";
 import Matches from "./Components/Matches";
 import TermsAndConditions from "./Components/TermsAndConditions";
 import MatchPage from "./Components/MatchPage";
+import Dashboard from "./Components/Dashboard";
 const App = () => {
   return (
     <div>
@@ -34,6 +35,7 @@ const App = () => {
         <Route path="/matches" element={<Matches />} />
         <Route path="/TermsAndConditions" element={<TermsAndConditions />} />
         <Route path="/match/:id" element={<MatchPage />} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </Router>
     </div>

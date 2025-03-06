@@ -93,7 +93,23 @@ export default function PlayerProfile() {
     const updatedArray = tempP[field].filter((_, i) => i !== index);
     setTempP({ ...tempP, [field]: updatedArray });
   };
-
+  
+  const handleSubmit = () => {
+    const newRequest = {
+      id: Date.now(),
+      fullName: formData.fullName,
+      email: formData.email,
+      phoneNumber: formData.number,
+      files: formData.files.map((file) => ({ name: file.name, url: "#" })),
+      submittedAt: new Date().toISOString(),
+      status: "Pending",
+    };
+  
+    // Mock adding request to admin state (replace with API or global state update)
+    console.log("Submitting Request:", newRequest);
+    setShowCertForm(false);
+  };
+  
   return (
     <div className="bg-white">
       <div className="pt-6">
