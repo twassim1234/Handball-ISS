@@ -14,7 +14,7 @@ const Login = () => {
   };
 
   return (
-    <div className=" py-20 min-w-screen flex items-center justify-center bg-gray-100">
+    <div className=" py-20 min-w-fit flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
         <h2 className="text-3xl font-bold text-center text-red-400">Login</h2>
         <form onSubmit={handleSubmit} className="mt-6">
@@ -61,26 +61,16 @@ const Login = () => {
               />
               Remember Me
             </label>
-            <Link to="/forgot-password" >
-              <p className="text-red-500 font-medium hover:underline"> Forgot Password?</p>
-            </Link>
+           
           </div>
 
           {/* Login Button */}
           <button
             type="submit"
-            className="w-full mt-6 p-3 bg-red-600 text-white font-semibold rounded-md hover:bg-blue-700 transition duration-300"
+            className="w-full mt-6 p-3 bg-red-600 text-white font-semibold rounded-md hover:bg-red-700 transition duration-300"
           >
             Login
           </button>
-
-          {/* Register Link */}
-          <p className="mt-4 text-center text-gray-600">
-            New here?{" "}
-            <Link to="/register">
-             <p className="text-red-500 font-medium hover:underline">Create an Account</p>
-            </Link>
-          </p>
         </form>
       </div>
     </div>

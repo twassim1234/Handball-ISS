@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import ManageAdmins from "./ManageAdmins";
-import Requests from "./Requests";
+import ManageAdmins from "../ManageAdmins";
+import Requests from "../Requests";
 
 export default function AdminPage() {
   return (

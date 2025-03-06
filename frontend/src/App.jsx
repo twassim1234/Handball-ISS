@@ -2,9 +2,9 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./Components/Login";
 import Register from "./Components/Register";
-import Home from "./Components/Home";
-import Contact from "./Components/Contact";
-import About from "./Components/About";
+import Home from "./Components/Pages/Home";
+import Contact from "./Components/Pages/Contact";
+import About from "./Components/Pages/About";
 import Navbar from "./Components/Navbar";
 import Player from "./Components/Player";
 import Teams from "./Components/Teams";
@@ -14,7 +14,7 @@ import PlayerPage from "./Components/PlayerPage";
 import Matches from "./Components/Matches";
 import TermsAndConditions from "./Components/TermsAndConditions";
 import MatchPage from "./Components/MatchPage";
-import Dashboard from "./Components/Dashboard";
+import Dashboard from "./Components/Pages/Dashboard";
 const App = () => {
   return (
     <div>

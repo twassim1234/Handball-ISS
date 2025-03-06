@@ -1,6 +1,6 @@
-import ContactForm from "./ContactForm"; 
+import ContactForm from "../Sections/ContactForm"; 
 import { Link } from "react-router-dom";
-import Navbar from "./Navbar";
+import Navbar from "../Navbar";
 
 const Contact = () => {
   return (
