@@ -77,7 +77,7 @@ export default function Teams() {
         <div className="grid grid-cols-1 gap-x-8 gap-y-20 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-12">
           {teams.map((team) => (
             <div key={team.id} className="group">
-              <Link to={`/team/${team.id}`}>
+              <Link to={`/team/${team.id}`}className="flex justify-center">
                 <img alt={team.imageAlt} src={team.imageSrc} className="max-w-80 px-12 h-60 rounded-lg object-cover group-hover:opacity-45 " />
               </Link>
               <h2 className="mt-4 text-3xl flex justify-center font-bold text-red-500">{team.name}</h2>

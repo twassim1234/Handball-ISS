@@ -27,7 +27,7 @@ const classNames = (...classes) => classes.filter(Boolean).join(" ");
 
 // Image Gallery Component
 const ImageGallery = ({ images }) => (
-  <div className="mx-auto mt-6 max-w-2xl sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-3 lg:gap-x-8 lg:px-8 pt-8">
+  <div className="mx-auto mt-6 max-w-2xl p-4 lg:grid lg:max-w-7xl lg:grid-cols-3 lg:gap-x-8 lg:px-8 pt-8">
     {images.map((image, index) => (
       <img
         key={index}
