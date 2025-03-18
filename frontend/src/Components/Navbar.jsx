@@ -21,7 +21,7 @@ const Navbar = () => {
         </li>
     
         <li className="my-4 py-4 border-b border-slate-800 hover:bg-slate-800 hover:rounded">
-          <a href="/juries">Juries</a>
+          <a href="/dashboard">Dashboard</a>
         </li>
         <li className="my-4 py-4 border-b border-slate-800 hover:bg-slate-800 hover:rounded">
           <a href="/matches">Matches</a>
@@ -62,7 +62,7 @@ const Navbar = () => {
     </li>
 
     <li className="hover:text-red-800  cursor-pointer">
-      <a href="/juries">Juries</a>
+      <a href="/dashboard">Dashboard</a>
     </li>
     <li className="hover:text-red-800  cursor-pointer">
       <a href="/matches">Matches</a>

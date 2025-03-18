@@ -1,28 +1,55 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom"; // For redirection
+import axios from "axios"; // API requests
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Email:", email);
-    console.log("Password:", password);
-    console.log("Remember Me:", rememberMe);
+    setError("");
+
+    try {
+      const response = await axios.post("http://localhost:8000/login", { email, password });
+
+      if (response.status === 200) {
+        const { token, admin } = response.data;
+        
+        // Store token in localStorage or sessionStorage
+        if (rememberMe) {
+          localStorage.setItem("token", token);
+          localStorage.setItem("user", JSON.stringify(admin));
+        } else {
+          sessionStorage.setItem("token", token);
+          sessionStorage.setItem("user", JSON.stringify(admin));
+        }
+
+        console.log("Login successful:", response.data);
+        navigate("/dashboard"); // Redirect after login
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        setError("Invalid email or password.");
+      } else {
+        setError("Something went wrong. Please try again later.");
+      }
+    }
   };
 
   return (
-    <div className=" py-20 min-w-fit flex items-center justify-center bg-gray-100">
+    <div className="py-20 min-w-fit flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
         <h2 className="text-3xl font-bold text-center text-red-400">Login</h2>
+        
+        {error && <p className="text-red-500 text-center mt-2">{error}</p>}
+
         <form onSubmit={handleSubmit} className="mt-6">
-          {/* Email */}
           <div>
-            <label htmlFor="email" className="block text-black font-medium">
-              Email
-            </label>
+            <label htmlFor="email" className="block text-black font-medium">Email</label>
             <input
               type="email"
               id="email"
@@ -34,11 +61,8 @@ const Login = () => {
             />
           </div>
 
-          {/* Password */}
           <div className="mt-4">
-            <label htmlFor="password" className="block text-black font-medium">
-              Password
-            </label>
+            <label htmlFor="password" className="block text-black font-medium">Password</label>
             <input
               type="password"
               id="password"
@@ -50,7 +74,6 @@ const Login = () => {
             />
           </div>
 
-          {/* Remember Me & Forgot Password */}
           <div className="flex justify-between items-center mt-4">
             <label className="flex items-center text-black">
               <input
@@ -61,10 +84,8 @@ const Login = () => {
               />
               Remember Me
             </label>
-           
           </div>
 
-          {/* Login Button */}
           <button
             type="submit"
             className="w-full mt-6 p-3 bg-red-600 text-white font-semibold rounded-md hover:bg-red-700 transition duration-300"
