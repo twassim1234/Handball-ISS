@@ -1,27 +1,7 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useParams } from "react-router-dom";
+import axios from "axios";
 import pic1 from "../Assets/Players/player11.png";
-import pic2 from "../Assets/Players/player12.jpg";
-import pic3 from "../Assets/Players/player13.jpg";
-import pic4 from "../Assets/Players/player14.jpg";
-import TermsAndConditions from "./TermsAndConditions";
-
-const initialP = {
-  name: "Wassim Trabelsi",
-  images: [
-    { src: pic1, alt: "Profile picture 1" },
-    { src: pic2, alt: "Profile picture 2" },
-    { src: pic3, alt: "Profile picture 3" },
-  ],
-  description: "A short description about the person...",
-  highlights: ["High quality", "Comfortable fit", "Stylish design"],
-  awards: ["Best player", "Champion 2024", "Pro player"],
-  birthday: "1999-01-01",
-  height: "190",
-  ref: "190b0",
-  placeofbirth: "Tunis",
-  qualification: "Yes",
-};
 
 const classNames = (...classes) => classes.filter(Boolean).join(" ");
 
@@ -40,9 +20,21 @@ const ImageGallery = ({ images }) => (
 );
 
 export default function PlayerProfile() {
-  const [p, setP] = useState(initialP);
+  const { id } = useParams(); // Get player ID from the URL
+  const [p, setP] = useState({
+    name: "",
+    images: [{ src: pic1, alt: "Profile picture" }], // Default image
+    description: "",
+    highlights: [],
+    awards: [],
+    birthday: "",
+    height: "",
+    ref: "",
+    placeofbirth: "",
+    qualification: "",
+  });
   const [isEditing, setIsEditing] = useState(false);
-  const [tempP, setTempP] = useState(initialP);
+  const [tempP, setTempP] = useState({ ...p });
   const [showCertForm, setShowCertForm] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
@@ -50,11 +42,81 @@ export default function PlayerProfile() {
     additionalInfo: "",
     files: [],
   });
-
-
-  // lel submit button
   const [accepted, setAccepted] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
+  // Fetch player data when the component mounts or when the ID changes
+  useEffect(() => {
+    const fetchPlayer = async () => {
+      try {
+        const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+        if (!token) {
+          setError("User not authenticated. Please log in.");
+          return;
+        }
+
+        const response = await axios.get(`http://localhost:8000/player/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const playerData = response.data;
+
+        // Map the API response to the component state
+        setP({
+          name: playerData.player_name,
+          images: [
+            {
+              src: playerData.image
+                ? playerData.image.startsWith("http")
+                  ? playerData.image
+                  : `http://localhost:8000/uploads/${playerData.image}`
+                : pic1, // Fallback to default image
+              alt: "Profile picture",
+            },
+          ],
+          description: playerData.description || "",
+          highlights: playerData.highlights ? playerData.highlights.split(",") : [],
+          awards: playerData.awards ? playerData.awards.split(",") : [],
+          birthday: playerData.birthday || "",
+          height: playerData.height || "",
+          ref: playerData.reference || "",
+          placeofbirth: playerData.place_of_birth || "",
+          qualification: playerData.qualified ? "Yes" : "No",
+        });
+
+        setTempP({
+          name: playerData.player_name,
+          images: [
+            {
+              src: playerData.image
+                ? playerData.image.startsWith("http")
+                  ? playerData.image
+                  : `http://localhost:8000/uploads/${playerData.image}`
+                : pic1,
+              alt: "Profile picture",
+            },
+          ],
+          description: playerData.description || "",
+          highlights: playerData.highlights ? playerData.highlights.split(",") : [],
+          awards: playerData.awards ? playerData.awards.split(",") : [],
+          birthday: playerData.birthday || "",
+          height: playerData.height || "",
+          ref: playerData.reference || "",
+          placeofbirth: playerData.place_of_birth || "",
+          qualification: playerData.qualified ? "Yes" : "No",
+        });
+
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching player:", error);
+        setError("Failed to load player data. Please try again.");
+        setLoading(false);
+      }
+    };
+
+    fetchPlayer();
+  }, [id]);
 
   // Handle Input Change
   const handleChange = (e) => {
@@ -70,9 +132,60 @@ export default function PlayerProfile() {
   };
 
   // Handle Save & Edit Toggle
-  const handleSave = () => {
-    setP(tempP);
-    setIsEditing(false);
+  const handleSave = async () => {
+    try {
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      if (!token) {
+        setError("User not authenticated. Please log in.");
+        return;
+      }
+
+      // Format the birthday field to YYYY-MM-DD
+      const formattedBirthday = tempP.birthday ? new Date(tempP.birthday).toISOString().split('T')[0] : null;
+
+      // Prepare the payload for the API
+      const payload = {
+        player_name: tempP.name,
+        height: tempP.height,
+        reference: tempP.ref,
+        birthday: formattedBirthday, // Use the formatted date
+        place_of_birth: tempP.placeofbirth,
+        description: tempP.description,
+        position: tempP.position,
+        qualified: tempP.qualification === "Yes" ? 1 : 0,
+        club_id: tempP.club_id,
+      };
+
+      console.log("Payload:", payload); // Log the payload
+
+      // Send the update request to the backend
+      const response = await axios.put(
+        `http://localhost:8000/player/${id}`,
+        payload,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      console.log("Backend Response:", response.data); // Log the backend response
+
+      if (response.status === 200) {
+        alert("Player updated successfully!");
+        setP(tempP); // Update the state with the new data
+        setIsEditing(false); // Exit edit mode
+      } else {
+        setError("Failed to update player. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error updating player:", error);
+      if (error.response) {
+        // Backend returned an error response
+        setError(error.response.data.error || "Failed to update player. Please try again.");
+      } else {
+        // Network or other errors
+        setError("Failed to update player. Please check your connection and try again.");
+      }
+    }
   };
 
   // Handle Dynamic Fields (Highlights & Awards)
@@ -82,9 +195,6 @@ export default function PlayerProfile() {
     setTempP({ ...tempP, [field]: updatedArray });
   };
 
-  const handleRequestClick = () => setIsMode(!isModifyMode);
-
-
   const handleAddItem = (field) => {
     setTempP({ ...tempP, [field]: [...tempP[field], ""] });
   };
@@ -93,7 +203,7 @@ export default function PlayerProfile() {
     const updatedArray = tempP[field].filter((_, i) => i !== index);
     setTempP({ ...tempP, [field]: updatedArray });
   };
-  
+
   const handleSubmit = () => {
     const newRequest = {
       id: Date.now(),
@@ -104,12 +214,20 @@ export default function PlayerProfile() {
       submittedAt: new Date().toISOString(),
       status: "Pending",
     };
-  
+
     // Mock adding request to admin state (replace with API or global state update)
     console.log("Submitting Request:", newRequest);
     setShowCertForm(false);
   };
-  
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="text-red-500 text-center">{error}</div>;
+  }
+
   return (
     <div className="bg-white">
       <div className="pt-6">
@@ -120,24 +238,11 @@ export default function PlayerProfile() {
         <ImageGallery images={p.images} />
 
         <div className="mx-auto max-w-2xl px-4 pt-10 pb-16 sm:px-6 lg:max-w-7xl lg:grid lg:grid-cols-3 lg:gap-x-8">
-          <div className="lg:col-span-2 lg:border-r lg:border-gray-200 lg:pr-8">
-            {isEditing ? (
-              <input
-                type="text"
-                name="name"
-                value={tempP.name}
-                onChange={handleChange}
-                className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl border p-2 w-full"
-              />
-            ) : (
-              <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
-                {p.name}
-              </h1>
-            )}
-          </div>
+          
 
           <div className="mt-4 lg:row-span-3">
-            {["height", "ref", "birthday", "placeofbirth"].map((field) => (
+            {["name","description","height", "ref", "birthday", "placeofbirth"].map((field) => (
+              
               <div key={field} className="pt-6">
                 <p className="text-2xl font-bold text-red-500">
                   {field.replace(/([A-Z])/g, " $1")}:
@@ -189,55 +294,10 @@ export default function PlayerProfile() {
             )}
           </div>
 
-          <div className="py-10 lg:col-span-2 lg:col-start-1 lg:border-r lg:border-gray-200 lg:pr-8">
-            <h2 className="font-bold">Description</h2>
-            {isEditing ? (
-              <textarea
-                name="description"
-                value={tempP.description}
-                onChange={handleChange}
-                className="border p-2 w-full"
-              />
-            ) : (
-              <p>{p.description}</p>
-            )}
-
-            <h2 className="font-bold mt-4">Highlights</h2>
-            {tempP.highlights.map((highlight, index) => (
-              <div key={index} className="flex gap-2 mt-2">
-                {isEditing ? (
-                  <>
-                    <input
-                      type="text"
-                      value={highlight}
-                      onChange={(e) =>
-                        handleArrayChange("highlights", index, e.target.value)
-                      }
-                      className="border p-2 w-full"
-                    />
-                    <button
-                      onClick={() => handleRemoveItem("highlights", index)}
-                      className="bg-red-500 text-white p-2"
-                    >
-                      X
-                    </button>
-                  </>
-                ) : (
-                  <p>{highlight}</p>
-                )}
-              </div>
-            ))}
-            {isEditing && (
-              <button
-                onClick={() => handleAddItem("highlights")}
-                className="bg-blue-500 text-white p-2 mt-2"
-              >
-                Add Highlight
-              </button>
-            )}
-          </div>
+          
         </div>
 
+        {/* Qualification Request Section */}
         <div className="bg-white flex items-center justify-center p-6">
           <button
             onClick={() => setShowCertForm(!showCertForm)}
@@ -266,59 +326,61 @@ export default function PlayerProfile() {
               <input
                 type="number"
                 name="number"
-                placeholder="phone number"
+                placeholder="Phone Number"
                 className="w-full p-2 border mb-2"
               />
               <label className="block font-medium mb-1">
-                Upload extrait de nessance:
+                Upload extrait de naissance:
               </label>
               <input type="file" multiple className="w-full p-2 border mb-2" />
 
               <label className="block font-medium mb-1">
-                Upload Autorisation parental:
+                Upload Autorisation parentale:
               </label>
               <input type="file" multiple className="w-full p-2 border mb-2" />
 
               <label className="block font-medium mb-1">
-                Upload CIN Scholaire:
+                Upload CIN Scolaire:
               </label>
               <input type="file" multiple className="w-full p-2 border mb-2" />
 
               <label className="block font-medium mb-1">Upload photo:</label>
               <input type="file" multiple className="w-full p-2 border mb-2" />
               <label className="block font-medium mb-1">
-                Upload Exstrait de payment:
+                Upload Extrait de paiement:
               </label>
               <input type="file" multiple className="w-full p-2 border mb-2" />
 
               <div className="flex items-start mb-3">
-        <input
-          type="checkbox"
-          id="terms"
-          className="mt-1 mr-2"
-          checked={accepted}
-          onChange={() => setAccepted(!accepted)}
-        />
-        <label htmlFor="terms" className="text-sm">
-          I agree to the <a href="/TermsAndConditions" className="text-blue-500 underline">terms and conditions</a>.
-        </label>
-      </div>
+                <input
+                  type="checkbox"
+                  id="terms"
+                  className="mt-1 mr-2"
+                  checked={accepted}
+                  onChange={() => setAccepted(!accepted)}
+                />
+                <label htmlFor="terms" className="text-sm">
+                  I agree to the{" "}
+                  <a href="/TermsAndConditions" className="text-blue-500 underline">
+                    terms and conditions
+                  </a>
+                  .
+                </label>
+              </div>
 
-
-
-
-      <button
-        className={`w-76 p-2 text-white rounded ${accepted ? "bg-blue-500 hover:bg-blue-600" : "bg-gray-400 cursor-not-allowed"}`}
-        disabled={!accepted}
-        onClick={() => setShowCertForm(false)}
-
-      >
-        Submit
-      </button>
+              <button
+                className={`w-76 p-2 text-white rounded ${
+                  accepted ? "bg-blue-500 hover:bg-blue-600" : "bg-gray-400 cursor-not-allowed"
+                }`}
+                disabled={!accepted}
+                onClick={() => setShowCertForm(false)}
+              >
+                Submit
+              </button>
               <button
                 type="button"
                 onClick={() => setShowCertForm(false)}
-                className=" w-76 pl-2 bg-red-500 text-white p-2 rounded  hover:bg-red-700"
+                className="w-76 pl-2 bg-red-500 text-white p-2 rounded hover:bg-red-700"
               >
                 Cancel
               </button>

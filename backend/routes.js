@@ -5,6 +5,20 @@ require('dotenv').config();
 const isAuth = require('./isAuth');
 const isAutho = require('./isAutho');
 
+const multer = require("multer");
+const path = require("path");
+
+// Set up storage
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/"); // Folder where images will be stored
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname)); // Unique file name
+  },
+});
+const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } }); // Limit to 5MB
+
 const router = express.Router();
 
 router.get('/clubs',isAuth, isAutho([1,2,3]), async (req, res) => {
@@ -43,10 +57,20 @@ router.get('/player/:id',isAuth,isAutho([1,2]), async (req, res) => {
 });
 
 // Update a player's information by ID
-router.put('/player/:id',isAuth,isAutho([1,2]), async (req, res) => {
+router.put('/player/:id', isAuth, isAutho([1, 2]), async (req, res) => {
   try {
     const playerId = parseInt(req.params.id, 10);
-    const { player_name, nationality, position, qualified, club_id } = req.body; 
+    const {
+      player_name,
+      height,
+      reference,
+      birthday, // Ensure this is in YYYY-MM-DD format
+      place_of_birth,
+      description,
+      position,
+      qualified,
+      club_id
+    } = req.body;
 
     if (isNaN(playerId)) {
       return res.status(400).json({ error: "Invalid player ID" });
@@ -60,9 +84,30 @@ router.put('/player/:id',isAuth,isAutho([1,2]), async (req, res) => {
       fieldsToUpdate.push("player_name = ?");
       values.push(player_name);
     }
-    if (nationality) {
-      fieldsToUpdate.push("nationality = ?");
-      values.push(nationality);
+    if (height) {
+      fieldsToUpdate.push("height = ?");
+      values.push(height);
+    }
+    if (reference) {
+      fieldsToUpdate.push("reference = ?");
+      values.push(reference);
+    }
+    if (birthday) {
+      // Validate the date format (YYYY-MM-DD)
+      const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!dateRegex.test(birthday)) {
+        return res.status(400).json({ error: "Invalid date format for birthday. Use YYYY-MM-DD." });
+      }
+      fieldsToUpdate.push("birthday = ?");
+      values.push(birthday);
+    }
+    if (place_of_birth) {
+      fieldsToUpdate.push("place_of_birth = ?");
+      values.push(place_of_birth);
+    }
+    if (description) {
+      fieldsToUpdate.push("description = ?");
+      values.push(description);
     }
     if (position) {
       fieldsToUpdate.push("position = ?");
@@ -96,12 +141,12 @@ router.put('/player/:id',isAuth,isAutho([1,2]), async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
-
 //delete a player
-router.delete('/player/:id',isAuth, isAutho([1,2]), async (req, res) => {
+router.delete("/player/:id", isAuth, isAutho([1, 2]), async (req, res) => {
   try {
-    const playerId = parseInt(req.params.id, 10);
+    console.log("Received player ID:", req.params.id); // Debugging log
 
+    const playerId = parseInt(req.params.id, 10);
     if (isNaN(playerId)) {
       return res.status(400).json({ error: "Invalid player ID" });
     }
@@ -119,20 +164,21 @@ router.delete('/player/:id',isAuth, isAutho([1,2]), async (req, res) => {
   }
 });
 
-//add a new player
-router.post('/player',isAuth,isAutho([1,2]), async (req, res) => {
+
+//Modified:add a new player
+router.post('/player', isAuth, isAutho([1, 2]), upload.single("image"), async (req, res) => {
+  console.log("Received body:", req.body);
+  console.log("Received file:", req.file);
   try {
     let { 
       player_name, height, reference, image, birthday, 
       place_of_birth, description, position, qualified, club_id 
     } = req.body;
+    const player_image = req.file ? req.file.filename : null;
 
     // Ensure qualified is treated as a boolean (convert 0/1 to true/false)
-    if (qualified === 0) {
-      qualified = false;
-    } else if (qualified === 1) {
-      qualified = true;
-    } else {
+    qualified = parseInt(req.body.qualified, 10);
+    if (qualified !== 0 && qualified !== 1) {
       return res.status(400).json({ error: "Qualified must be 1 or 0" });
     }
 
@@ -149,7 +195,7 @@ router.post('/player',isAuth,isAutho([1,2]), async (req, res) => {
     `;
 
     const [result] = await pool.promise().query(query, [
-      player_name, height || null, reference || null, image || null, birthday || null, 
+      player_name, height || null, reference || null, player_image || null, birthday || null, 
       place_of_birth || null, description || null, position, qualified, club_id
     ]);
 
@@ -159,8 +205,8 @@ router.post('/player',isAuth,isAutho([1,2]), async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
-//get a club detail
-router.get('/club/:club_id',isAuth,isAutho([1,2,3]), async (req, res) => {
+//Modified:get a club detail
+router.get('/club/:club_id', isAuth, isAutho([1,2,3]), async (req, res) => {
   try {
     const clubId = parseInt(req.params.club_id, 10);
 
@@ -169,9 +215,10 @@ router.get('/club/:club_id',isAuth,isAutho([1,2,3]), async (req, res) => {
       return res.status(400).json({ error: "Invalid club ID" });
     }
 
-    // Query to get all information about the club, its players' names, and the club's details
+    // Query to get club details along with player details
     const query = `
-      SELECT c.club_id, c.club_name, c.club_picture, c.club_details, c.extra_details, p.player_name
+      SELECT c.club_id, c.club_name, c.club_picture, c.club_details, c.extra_details, 
+             p.player_id, p.player_name, p.image
       FROM club c
       LEFT JOIN player p ON c.club_id = p.club_id
       WHERE c.club_id = ?
@@ -182,14 +229,20 @@ router.get('/club/:club_id',isAuth,isAutho([1,2,3]), async (req, res) => {
       return res.status(404).json({ error: "Club not found or no players in the club" });
     }
 
-    // Format response: Club details + array of player names
+    // Format response: Club details + array of players (id, name & image)
     const clubInfo = {
       club_id: rows[0].club_id,
       club_name: rows[0].club_name,
       club_picture: rows[0].club_picture,
       club_details: rows[0].club_details,
       extra_details: rows[0].extra_details,
-      players: rows.map(row => row.player_name).filter(Boolean) // Only include player names, filter out nulls
+      players: rows
+        .filter(row => row.player_id) // Ensure we don't include null player entries
+        .map(row => ({
+          player_id: row.player_id,
+          name: row.player_name,
+          image: row.image || null  // Default to null if no image is available
+        }))
     };
 
     res.json(clubInfo);
@@ -199,11 +252,13 @@ router.get('/club/:club_id',isAuth,isAutho([1,2,3]), async (req, res) => {
   }
 });
 
-//modify a club detail
-router.put('/club/:club_id',isAuth,isAutho([1,2]), async (req, res) => {
+
+
+//Modified:modify a club detail
+router.put('/club/:club_id', isAuth, isAutho([1, 2]), async (req, res) => {
   try {
     const clubId = parseInt(req.params.club_id, 10);
-    const { club_name } = req.body; // Example fields you want to update
+    const { club_name, club_details, extra_details } = req.body; // Include extra_details in the request body
 
     // Validate the clubId
     if (isNaN(clubId)) {
@@ -211,7 +266,7 @@ router.put('/club/:club_id',isAuth,isAutho([1,2]), async (req, res) => {
     }
 
     // Validate the incoming data
-    if (!club_name) {
+    if (!club_name && !club_details && !extra_details) {
       return res.status(400).json({ error: "At least one field must be provided to update" });
     }
 
@@ -222,6 +277,14 @@ router.put('/club/:club_id',isAuth,isAutho([1,2]), async (req, res) => {
     if (club_name) {
       updateFields.push('club_name = ?');
       values.push(club_name);
+    }
+    if (club_details) {
+      updateFields.push('club_details = ?');
+      values.push(club_details);
+    }
+    if (extra_details) {
+      updateFields.push('extra_details = ?');
+      values.push(extra_details);
     }
 
     // Add the club_id to the values array (last element in the query)
@@ -275,17 +338,18 @@ router.delete('/club/:club_id',isAuth,isAutho([1,2]), async (req, res) => {
   }
 });
 //club names and pictures
-router.get('/clubs/pic',isAuth,isAutho([1,2,3]), async (req, res) => {
+router.get('/clubs/pic', isAuth, isAutho([1, 2, 3]), async (req, res) => {
   try {
-    // Fetch all club names and pictures
-    const [rows] = await pool.promise().query("SELECT club_name, club_picture FROM club");
+    // Fetch all club names, pictures, and club_id
+    const [rows] = await pool.promise().query("SELECT club_id, club_name, club_picture FROM club");
 
     if (rows.length === 0) {
       return res.status(404).json({ error: "No clubs found" });
     }
 
-    // Extract and return the club names and their pictures as an array
+    // Extract and return the club_id, club names, and their pictures as an array
     const clubs = rows.map(row => ({
+      club_id: row.club_id, // Include club_id in the response
       club_name: row.club_name,
       club_picture: row.club_picture
     }));
@@ -296,17 +360,25 @@ router.get('/clubs/pic',isAuth,isAutho([1,2,3]), async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
-//create a club
-router.post('/club/post',isAuth,isAutho([1]), async (req, res) => {
-  const { club_name, club_picture, club_details, extra_details, club_admin_id } = req.body;
+//Modified create a club
+router.post('/club/post', isAuth, isAutho([1]), upload.single("club_picture"), async (req, res) => {
+  const { club_name, club_details, extra_details, first_name, last_name } = req.body;
+  const club_picture = req.file ? req.file.filename : null;
 
-  // Validate required fields
-  if (!club_name || !club_admin_id) {
-    return res.status(400).json({ error: "Missing required fields: club_name, club_admin_id" });
+  if (!club_name || !first_name || !last_name) {
+    return res.status(400).json({ error: "Missing required fields: club_name, first_name, last_name" });
   }
 
   try {
-    // Insert the new club into the database
+    const adminQuery = `SELECT admin_id FROM admin_account WHERE first_name = ? AND last_name = ?`;
+    const [adminResult] = await pool.promise().query(adminQuery, [first_name, last_name]);
+
+    if (adminResult.length === 0) {
+      return res.status(404).json({ error: "Admin not found" });
+    }
+
+    const club_admin_id = adminResult[0].admin_id;
+
     const query = `
       INSERT INTO club (club_name, club_picture, club_details, extra_details, club_admin_id)
       VALUES (?, ?, ?, ?, ?)
@@ -319,6 +391,7 @@ router.post('/club/post',isAuth,isAutho([1]), async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
 
 // Post a qualification request according to the player name
 router.post('/qualification-request',isAuth,isAutho([1,2]), async (req, res) => {
