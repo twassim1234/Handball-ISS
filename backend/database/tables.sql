@@ -7,7 +7,7 @@ CREATE TABLE role (
     role_id INT AUTO_INCREMENT PRIMARY KEY,
     role_name ENUM('federation_admin', 'club_admin', 'referee','DNA_Admin') UNIQUE
 );
-
+SELECT * FROM admin_account;
 INSERT INTO role (role_name) 
 VALUES 
   ('federation_admin'), 
@@ -43,7 +43,7 @@ CREATE TABLE club (
     club_admin_id INT,
     FOREIGN KEY (club_admin_id) REFERENCES admin_account(admin_id) ON DELETE SET NULL
 );
-
+select * from club;
 -- Separate table for club highlights
 CREATE TABLE club_highlight (
     highlight_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -51,12 +51,14 @@ CREATE TABLE club_highlight (
     highlight_text VARCHAR(255) NOT NULL,
     FOREIGN KEY (club_id) REFERENCES club(club_id) ON DELETE CASCADE
 );
+UPDATE club 
+SET club_picture = 'https://upload.wikimedia.org/wikipedia/fr/3/34/CA_Bizertin_Old.png' 
+WHERE club_name = 'Handball Club B';
 
 -- Insert Clubs
 INSERT INTO club (club_name, club_picture, club_details, extra_details, club_admin_id) 
 VALUES 
-  ('Handball Club A', 'images/clubA.jpg', 'A top-tier handball club', 'Has won multiple championships', 2),
-  ('Handball Club B', 'images/clubB.png', 'An emerging handball club', 'Has a strong youth program', 2);
+  ('Handball Club A', 'images/clubA.jpg', 'A top-tier handball club', 'Has won multiple championships', 2);
 
 -- Insert Highlights for Clubs
 INSERT INTO club_highlight (club_id, highlight_text) 
@@ -82,6 +84,7 @@ CREATE TABLE player (
     FOREIGN KEY (club_id) REFERENCES club(club_id) ON DELETE CASCADE
 );
 select * from club;
+select * from player;
 -- Separate table for player highlights
 CREATE TABLE player_highlight (
     highlight_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -93,9 +96,9 @@ CREATE TABLE player_highlight (
 -- Insert Players into Clubs
 INSERT INTO player (player_name, height, reference, image, birthday, place_of_birth, description, position, qualified, club_id) 
 VALUES 
-  ('John Doe', 185, 'JD123', 'images/john_doe.jpg', '1998-05-12', 'Los Angeles, USA', 'A talented goalkeeper', 'Goalkeeper', TRUE, 2),
-  ('Jane Smith', 175, 'JS567', 'images/jane_smith.jpg', '2000-08-23', 'Paris, France', 'A quick and agile left-wing', 'Left Wing', TRUE, 3),
-  ('Michael Johnson', 188, 'MJ890', 'images/michael_johnson.jpg', '1995-02-10', 'Berlin, Germany', 'A strong center-back', 'Center Back', TRUE, 4);
+  ('John Doe', 185, 'JD123', 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Khalil_Chemmam.jpg/1024px-Khalil_Chemmam.jpg', '1998-05-12', 'Los Angeles, USA', 'A talented goalkeeper', 'Goalkeeper', TRUE, 10),
+  ('Jane Smith', 175, 'JS567', 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Khalil_Chemmam.jpg/1024px-Khalil_Chemmam.jpg', '2000-08-23', 'Paris, France', 'A quick and agile left-wing', 'Left Wing', TRUE, 10),
+  ('Michael Johnson', 188, 'MJ890', 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Khalil_Chemmam.jpg/1024px-Khalil_Chemmam.jpg', '1995-02-10', 'Berlin, Germany', 'A strong center-back', 'Center Back', TRUE, 10);
 
 -- Insert Highlights for Players
 INSERT INTO player_highlight (player_id, highlight_text) 
@@ -175,15 +178,18 @@ CREATE TABLE qualification_request (
     fullname VARCHAR(100) NOT NULL, 
     email VARCHAR(100) NOT NULL, 
     phone_number VARCHAR(20) NOT NULL, 
-
-    extrait_de_naissance LONGBLOB,
-    autorisation_parentale LONGBLOB,
-    cin_scolaire LONGBLOB,
-    photo LONGBLOB,
-    extrait_de_payment LONGBLOB,
+    extrait_de_naissance VARCHAR(255), -- File path
+    autorisation_parentale VARCHAR(255), -- File path
+    cin_scolaire VARCHAR(255), -- File path
+    photo VARCHAR(255), -- File path
+    extrait_de_payment VARCHAR(255), -- File path
     
     FOREIGN KEY (player_id) REFERENCES player(player_id) ON DELETE CASCADE
 );
+select * from qualification_request;
+
+
+
 INSERT INTO qualification_request (
     player_id, fullname, email, phone_number, 
     extrait_de_naissance, autorisation_parentale, cin_scolaire, photo, extrait_de_payment, 

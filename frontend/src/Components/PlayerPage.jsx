@@ -128,7 +128,16 @@ export default function PlayerProfile() {
   };
 
   const handleFileChange = (e) => {
-    setFormData({ ...formData, files: [...e.target.files] });
+    const files = Array.from(e.target.files);
+    const fieldName = e.target.name; // Get the field name from the input
+  
+    // Store the file along with its field name
+    const updatedFiles = files.map((file) => ({
+      file, // Store the File object directly
+      name: fieldName,
+    }));
+  
+    setFormData({ ...formData, files: [...formData.files, ...updatedFiles] });
   };
 
   // Handle Save & Edit Toggle
@@ -204,20 +213,46 @@ export default function PlayerProfile() {
     setTempP({ ...tempP, [field]: updatedArray });
   };
 
-  const handleSubmit = () => {
-    const newRequest = {
-      id: Date.now(),
-      fullName: formData.fullName,
-      email: formData.email,
-      phoneNumber: formData.number,
-      files: formData.files.map((file) => ({ name: file.name, url: "#" })),
-      submittedAt: new Date().toISOString(),
-      status: "Pending",
-    };
-
-    // Mock adding request to admin state (replace with API or global state update)
-    console.log("Submitting Request:", newRequest);
-    setShowCertForm(false);
+  const handleSubmit = async () => {
+    const formDataToSend = new FormData();
+    formDataToSend.append('fullname', formData.fullName);
+    formDataToSend.append('email', formData.email);
+    formDataToSend.append('phone_number', formData.phoneNumber);
+  
+    // Append files with the correct field names
+    formData.files.forEach((file) => {
+      formDataToSend.append(file.name, file.file); // Use the file's name as the field name
+    });
+  
+    // Debug: Log the FormData object
+    for (let [key, value] of formDataToSend.entries()) {
+      console.log(key, value);
+    }
+  
+    try {
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      if (!token) {
+        setError("User not authenticated. Please log in.");
+        return;
+      }
+  
+      const response = await axios.post('http://localhost:8000/qualification-request', formDataToSend, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+  
+      if (response.status === 201) {
+        alert("Qualification request submitted successfully!");
+        setShowCertForm(false);
+      } else {
+        setError("Failed to submit qualification request. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error submitting qualification request:", error);
+      setError("Failed to submit qualification request. Please check your connection and try again.");
+    }
   };
 
   if (loading) {
@@ -315,41 +350,69 @@ export default function PlayerProfile() {
                 type="text"
                 name="fullName"
                 placeholder="Full Name"
+                value={formData.fullName}
+                onChange={handleFormChange}
                 className="w-full p-2 border mb-2"
               />
               <input
                 type="email"
                 name="email"
                 placeholder="Email"
+                value={formData.email}
+                onChange={handleFormChange}
                 className="w-full p-2 border mb-2"
               />
               <input
                 type="number"
-                name="number"
+                name="phoneNumber"
                 placeholder="Phone Number"
+                value={formData.phoneNumber}
+                onChange={handleFormChange}
                 className="w-full p-2 border mb-2"
               />
               <label className="block font-medium mb-1">
                 Upload extrait de naissance:
               </label>
-              <input type="file" multiple className="w-full p-2 border mb-2" />
-
+              <input
+                type="file"
+                name="extrait_de_naissance"
+                onChange={handleFileChange}
+                className="w-full p-2 border mb-2"
+              />
               <label className="block font-medium mb-1">
                 Upload Autorisation parentale:
               </label>
-              <input type="file" multiple className="w-full p-2 border mb-2" />
-
+              <input
+                type="file"
+                name="autorisation_parentale"
+                onChange={handleFileChange}
+                className="w-full p-2 border mb-2"
+              />
               <label className="block font-medium mb-1">
                 Upload CIN Scolaire:
               </label>
-              <input type="file" multiple className="w-full p-2 border mb-2" />
-
+              <input
+                type="file"
+                name="cin_scolaire"
+                onChange={handleFileChange}
+                className="w-full p-2 border mb-2"
+              />
               <label className="block font-medium mb-1">Upload photo:</label>
-              <input type="file" multiple className="w-full p-2 border mb-2" />
+              <input
+                type="file"
+                name="photo"
+                onChange={handleFileChange}
+                className="w-full p-2 border mb-2"
+              />
               <label className="block font-medium mb-1">
                 Upload Extrait de paiement:
               </label>
-              <input type="file" multiple className="w-full p-2 border mb-2" />
+              <input
+                type="file"
+                name="extrait_de_payment"
+                onChange={handleFileChange}
+                className="w-full p-2 border mb-2"
+              />
 
               <div className="flex items-start mb-3">
                 <input
@@ -373,7 +436,7 @@ export default function PlayerProfile() {
                   accepted ? "bg-blue-500 hover:bg-blue-600" : "bg-gray-400 cursor-not-allowed"
                 }`}
                 disabled={!accepted}
-                onClick={() => setShowCertForm(false)}
+                onClick={handleSubmit}
               >
                 Submit
               </button>

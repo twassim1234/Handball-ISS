@@ -19,6 +19,24 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } }); // Limit to 5MB
 
+
+//PDF 
+// Multer storage for PDFs
+const pdfStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "pdf_uploads/"); // Folder where PDFs will be stored
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname)); // Unique file name
+  },
+});
+
+const pdfUpload  = multer({ 
+  storage: pdfStorage, 
+  limits: { fileSize: 5 * 1024 * 1024 } // Limit to 5MB
+});
+
+
 const router = express.Router();
 
 router.get('/clubs',isAuth, isAutho([1,2,3]), async (req, res) => {
@@ -394,43 +412,96 @@ router.post('/club/post', isAuth, isAutho([1]), upload.single("club_picture"), a
 
 
 // Post a qualification request according to the player name
-router.post('/qualification-request',isAuth,isAutho([1,2]), async (req, res) => {
-  try {
-    const { fullname, email, phone_number, extrait_de_naissance, autorisation_parentale, cin_scolaire, photo, extrait_de_payment } = req.body;
+router.post(
+  "/qualification-request",
+  isAuth,
+  isAutho([1, 2]),
+  pdfUpload.fields([
+    { name: "extrait_de_naissance", maxCount: 1 },
+    { name: "autorisation_parentale", maxCount: 1 },
+    { name: "cin_scolaire", maxCount: 1 },
+    { name: "photo", maxCount: 1 },
+    { name: "extrait_de_payment", maxCount: 1 },
+  ]),
+  async (req, res) => {
+    try {
+      const { fullname, email, phone_number } = req.body;
+      const files = req.files;
 
-    // Validate required fields
-    if (!fullname || !email || !phone_number || !extrait_de_naissance || !autorisation_parentale || !cin_scolaire || !photo || !extrait_de_payment) {
-      return res.status(400).json({ error: "All fields are required" });
+      // Debug: Log the received files
+      console.log("Received files:", files);
+
+      // Validate required fields
+      if (
+        !fullname ||
+        !email ||
+        !phone_number ||
+        !files.extrait_de_naissance ||
+        !files.autorisation_parentale ||
+        !files.cin_scolaire ||
+        !files.photo ||
+        !files.extrait_de_payment
+      ) {
+        return res.status(400).json({ error: "All fields are required" });
+      }
+
+      // Check if the fullname exists in the player table
+      const [playerRows] = await pool
+        .promise()
+        .query("SELECT player_id FROM player WHERE player_name = ?", [fullname]);
+
+      if (playerRows.length === 0) {
+        return res.status(404).json({ error: "Player not found" });
+      }
+
+      const playerId = playerRows[0].player_id; // Get matched player ID
+
+      // Normalize file paths (replace backslashes with forward slashes)
+      const extraitDeNaissancePath = files.extrait_de_naissance[0].path.replace(/\\/g, "/");
+      const autorisationParentalePath = files.autorisation_parentale[0].path.replace(/\\/g, "/");
+      const cinScolairePath = files.cin_scolaire[0].path.replace(/\\/g, "/");
+      const photoPath = files.photo[0].path.replace(/\\/g, "/");
+      const extraitDePaymentPath = files.extrait_de_payment[0].path.replace(/\\/g, "/");
+
+      // Debug: Log the normalized file paths
+      console.log("Normalized file paths:", {
+        extraitDeNaissancePath,
+        autorisationParentalePath,
+        cinScolairePath,
+        photoPath,
+        extraitDePaymentPath,
+      });
+
+      // Insert into qualification_request table
+      const insertQuery = `
+        INSERT INTO qualification_request (
+          player_id, fullname, email, phone_number, 
+          extrait_de_naissance, autorisation_parentale, cin_scolaire, photo, extrait_de_payment
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `;
+
+      const [result] = await pool.promise().query(insertQuery, [
+        playerId,
+        fullname,
+        email,
+        phone_number,
+        extraitDeNaissancePath,
+        autorisationParentalePath,
+        cinScolairePath,
+        photoPath,
+        extraitDePaymentPath,
+      ]);
+
+      res.status(201).json({
+        message: "Qualification request submitted successfully",
+        request_id: result.insertId,
+      });
+    } catch (error) {
+      console.error("Error submitting qualification request:", error);
+      res.status(500).json({ error: "Internal Server Error" });
     }
-
-    // Check if the fullname exists in the player table
-    const [playerRows] = await pool.promise().query("SELECT player_id FROM player WHERE player_name = ?", [fullname]);
-
-    if (playerRows.length === 0) {
-      return res.status(404).json({ error: "Player not found" });
-    }
-
-    const playerId = playerRows[0].player_id; // Get matched player ID
-
-    // Insert into qualification_request table
-    const insertQuery = `
-      INSERT INTO qualification_request (
-        player_id, fullname, email, phone_number, 
-        extrait_de_naissance, autorisation_parentale, cin_scolaire, photo, extrait_de_payment
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `;
-
-    const [result] = await pool.promise().query(insertQuery, [
-      playerId, fullname, email, phone_number, 
-      extrait_de_naissance, autorisation_parentale, cin_scolaire, photo, extrait_de_payment// Assume terms are accepted
-    ]);
-
-    res.status(201).json({ message: "Qualification request submitted successfully", request_id: result.insertId });
-  } catch (error) {
-    console.error("Error submitting qualification request:", error);
-    res.status(500).json({ error: "Internal Server Error" });
   }
-});
+);
 
 //get all qualification requests and their details
 router.get('/qualification-requests/retrieve',isAuth,isAutho([1]), async (req, res) => {
