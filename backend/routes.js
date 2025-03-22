@@ -468,6 +468,21 @@ router.post('/register',isAuth,isAutho([1]), async (req, res) => {
   }
 });
 
+//get admin
+router.get('/admin',isAuth, async (req, res) => {
+  try {
+      const user = await getUserById(req.user.id);
+      if (!user) {
+          return res.status(404).json({ error: "User not found" });
+      }
+      console.log(user);
+      res.json(user);
+  } catch (error) {
+      console.error("Error fetching users:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 //delete admin
 router.delete('/admin/:admin_id',isAuth,isAutho([1]), async (req, res) => {
   const adminId = parseInt(req.params.admin_id, 10);
@@ -524,6 +539,11 @@ router.post('/login', async (req, res) => {
 
 async function getUserByEmail(email) {
   const [result] = await pool.promise().query('SELECT * FROM admin_account WHERE email = ?', [email]);
+  return result[0];
+}
+
+async function getUserById(id) {
+  const [result] = await pool.promise().query('SELECT * FROM admin_account WHERE admin_id = ?', [id]);
   return result[0];
 }
 

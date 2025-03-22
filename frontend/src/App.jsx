@@ -15,8 +15,11 @@ import Matches from "./Components/Matches";
 import TermsAndConditions from "./Components/TermsAndConditions";
 import MatchPage from "./Components/MatchPage";
 import Dashboard from "./Components/Pages/Dashboard";
+import UserContextProvider from "./Contexts/userContext";
+
 const App = () => {
   return (
+    <UserContextProvider>
     <div>
     <Router>
     <Navbar />
@@ -39,6 +42,7 @@ const App = () => {
       </Routes>
     </Router>
     </div>
+    </UserContextProvider>
   );
 };
 
