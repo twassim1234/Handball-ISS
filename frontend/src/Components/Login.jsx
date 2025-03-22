@@ -20,16 +20,10 @@ const Login = () => {
         const { token, admin } = response.data;
         
         // Store token in localStorage or sessionStorage
-        if (rememberMe) {
-          localStorage.setItem("token", token);
-          localStorage.setItem("user", JSON.stringify(admin));
-        } else {
-          sessionStorage.setItem("token", token);
-          sessionStorage.setItem("user", JSON.stringify(admin));
-        }
+        localStorage.setItem("token", token);
 
         console.log("Login successful:", response.data);
-        navigate("/dashboard"); // Redirect after login
+        navigate("/home"); // Redirect after login
       }
     } catch (error) {
       if (error.response && error.response.status === 401) {
