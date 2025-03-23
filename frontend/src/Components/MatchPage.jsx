@@ -47,10 +47,8 @@ export default function MatchPage() {
       <img src={match.image_url} alt={`${match.club1_name} vs ${match.club2_name}`} className=" w-full h-full flex items-center  object-cover rounded-b-4xl" />
 
       <MatchDetails/>
-      <ListOfPlayers club1_name={match.club1_name} club2_name={match.club2_name}/>
+      <ListOfPlayers match_id={match.match_id} club1_id={match.club1} club2_id={match.club2} club1_name={match.club1_name} club2_name={match.club2_name}/>
       <ReclamationSection/>
-
-
 
     </div>:
     <div className="flex justify-center items-center h-96">
