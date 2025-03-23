@@ -1,6 +1,6 @@
 import React from "react";
 
-const ListOfPlayers = () => {
+const ListOfPlayers = ({club1_name, club2_name}) => {
   return (
     <div>
       <div className="flex space-x-4 mt-12">
@@ -12,7 +12,7 @@ const ListOfPlayers = () => {
                 colSpan="8"
                 className="bg-blue-600 text-white text-center py-2"
               >
-                Team A
+                {club1_name}
               </th>
             </tr>
             
@@ -73,7 +73,7 @@ const ListOfPlayers = () => {
                 colSpan="8"
                 className="bg-blue-600 text-white text-center py-2"
               >
-                Team B
+                {club2_name}
               </th>
             </tr>
             <tr className="bg-gray-200">
