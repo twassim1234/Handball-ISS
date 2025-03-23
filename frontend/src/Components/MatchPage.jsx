@@ -20,7 +20,11 @@ const matches = [
 export default function MatchPage() {
   const { id } = useParams();
   const match = matches.find((m) => m.id === parseInt(id));
-
+  const fetchMatch = async () => {
+    const response = await fetch(`http://localhost:8000/matches/${id}`);
+    const data = await response.json();
+    console.log(data);
+  }
   if (!match) {
     return <div className="p-6">Match not found.</div>;
   }

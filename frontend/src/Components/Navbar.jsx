@@ -3,9 +3,20 @@ import Logo from "../Assets/logonav.jpg";
 import { Link } from "react-router-dom";
 import { FaRegWindowClose, FaBars } from "react-icons/fa";
 import Login from "./Login";
+import { useContext } from "react";
+import { UserContext } from "../Contexts/UserContext";
+
 const Navbar = () => {
+  const { user, setUser } = useContext(UserContext);
   const [click, setClick] = useState(false);
   const handleClick = () => setClick(!click);
+
+  const handleLogout = () => {
+    if(user){
+      localStorage.removeItem("token");
+      setUser(undefined);
+    }
+  }
 
   const content = (
     <div
@@ -14,7 +25,7 @@ const Navbar = () => {
     >
       <ul className="text-center text-xl p-4">
         <li className="my-4 py-4 border-b border-slate-800 hover:bg-slate-800 hover:rounded">
-          <a href="/home">Home</a>
+          <a href="/">Home</a>
         </li>
         <li className="my-4 py-4 border-b border-slate-800 hover:bg-slate-800 hover:rounded">
           <a href="/teams">Teams</a>
@@ -33,7 +44,7 @@ const Navbar = () => {
           <a href="/contact">Contact us</a>
         </li>
         <li className="my-4 py-4 border-b border-slate-800 hover:bg-slate-800 hover:rounded">
-          <a href="/">Login</a>
+          <a href="/login">Login</a>
         </li>
       </ul>
     </div>
@@ -47,7 +58,7 @@ const Navbar = () => {
       >
         <div className="flex items-center flex-1">
           <span>
-            <Link to="/home">
+            <Link to="/">
             <img src={Logo} alt="Logo" className="w-96" /></Link>
           </span>
         </div>
@@ -55,7 +66,7 @@ const Navbar = () => {
         <div className="lg:flex hidden lg:flex-1 items-center justify-center font-normal">
   <ul className="flex gap-12 text-[18px]">
     <li className="hover:text-red-800 cursor-pointer">
-      <a href="/home">Home</a>
+      <a href="/">Home</a>
     </li>
     <li className="hover:text-red-800 cursor-pointer">
       <a href="/teams">Teams</a>
@@ -77,11 +88,10 @@ const Navbar = () => {
 
   {/* Login button aligned to the left */}
   <div className="lg:ml-96 bg-red-500 text-white py-2 px-4 rounded-full cursor-pointer hover:bg-red-800 transition">
-      <a href="/">Login</a>
+      <a href={user?"/":"/login"} onClick={handleLogout}>{user?"Logout":"Login"}</a>
     
   </div>
 </div>
-
 
         {/* Mobile Menu Button */}
         <div className="lg:hidden  flex items-center">

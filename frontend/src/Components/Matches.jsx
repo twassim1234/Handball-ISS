@@ -1,6 +1,9 @@
 import { useState } from "react";
 import pic1 from "../Assets/Matche/match.jpg";
 import { Link } from "react-router-dom";
+import AuthenticationLayout from "../Layouts/AuthenticationLayout";
+import { useContext } from "react";
+import { UserContext } from "../Contexts/UserContext";
 
 const initialMatches = [
   {
@@ -34,6 +37,7 @@ export default function MatchList() {
   const [filter, setFilter] = useState("all");
   const [showForm, setShowForm] = useState(false);
   const [imagePreview, setImagePreview] = useState("");
+  const { user } = useContext(UserContext);
 
   const [newMatch, setNewMatch] = useState({
     team1: "",
@@ -109,7 +113,14 @@ export default function MatchList() {
     setImagePreview(""); 
   };
 
+  const handleMatchClick=(event)=>{
+    if(!user){
+      event.preventDefault();
+    }
+  }
+
   return (
+    <AuthenticationLayout>
     <div className="p-6 md:p-8 lg:p-22">
       <div className="flex gap-2 mb-6">
         <button onClick={() => setFilter("all")} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-800 transition">
@@ -125,7 +136,7 @@ export default function MatchList() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
   {filteredMatches.map((match) => (
-    <Link to={`/match/${match.id}`} key={match.id} className="p-4 border rounded-lg shadow-md bg-white cursor-pointer">
+    <Link to={`/match/${match.id}`} key={match.id} onClick={handleMatchClick} className="p-4 border rounded-lg shadow-md bg-white cursor-pointer">
       <div className="flex justify-center items-center">
         <img
           src={match.image}
@@ -142,13 +153,14 @@ export default function MatchList() {
   ))}
 </div>
 
-
-      <div className="mt-8 text-center">
+      { user && [1,3].includes(user.role_id) &&
+        <div className="mt-8 text-center">
         <button onClick={handleAddGame} className="px-6 py-3 bg-green-500 text-white rounded hover:bg-green-600 transition">
           Add New Match
         </button>
       </div>
-
+      }
+      
       {showForm && (
         <div className="mt-8 p-6 border rounded-lg shadow-md bg-white">
           <h3 className="text-xl font-bold mb-4">Add New Match</h3>
@@ -189,5 +201,6 @@ export default function MatchList() {
         </div>
       )}
     </div>
+    </AuthenticationLayout>
   );
 }

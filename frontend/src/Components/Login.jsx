@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; // For redirection
 import axios from "axios"; // API requests
+import AuthenticationLayout from "../Layouts/AuthenticationLayout";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -18,12 +19,11 @@ const Login = () => {
 
       if (response.status === 200) {
         const { token, admin } = response.data;
-        
-        // Store token in localStorage or sessionStorage
+      
         localStorage.setItem("token", token);
 
         console.log("Login successful:", response.data);
-        navigate("/home"); // Redirect after login
+        navigate("/"); 
       }
     } catch (error) {
       if (error.response && error.response.status === 401) {
@@ -35,6 +35,7 @@ const Login = () => {
   };
 
   return (
+    <AuthenticationLayout redirectTo={"/"}>
     <div className="py-20 min-w-fit flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
         <h2 className="text-3xl font-bold text-center text-red-400">Login</h2>
@@ -89,6 +90,7 @@ const Login = () => {
         </form>
       </div>
     </div>
+    </AuthenticationLayout>
   );
 };
 
