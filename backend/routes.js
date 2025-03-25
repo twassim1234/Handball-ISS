@@ -582,8 +582,72 @@ router.put('/qualification-request/:request_id/status',isAuth,isAutho([1]), asyn
 
 //match
 
+// Get all matches
+// Get all matches with club names
+router.get('/matches', isAuth, isAutho([1, 2, 3]), async (req, res) => {
+  try {
+    const query = `
+      SELECT 
+        hm.*,
+        c1.club_name AS club1_name,
+        c2.club_name AS club2_name
+      FROM 
+        handball_match hm
+      LEFT JOIN 
+        club c1 ON hm.club1 = c1.club_id
+      LEFT JOIN 
+        club c2 ON hm.club2 = c2.club_id;
+    `;
 
+    const [rows] = await pool.promise().query(query);
 
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "No matches found" });
+    }
+
+    res.json({ matches: rows });
+  } catch (error) {
+    console.error("Error fetching matches:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// Get a match by ID
+router.get('/matches/:id', isAuth, isAutho([1, 2, 3]), async (req, res) => {
+  try {
+    const matchId = parseInt(req.params.id);
+
+    if (isNaN(matchId)) {
+      return res.status(400).json({ error: "Invalid match ID" });
+    }
+
+    const query = `
+      SELECT 
+        hm.*,
+        c1.club_name AS club1_name,
+        c2.club_name AS club2_name
+      FROM 
+        handball_match hm
+      LEFT JOIN 
+        club c1 ON hm.club1 = c1.club_id
+      LEFT JOIN 
+        club c2 ON hm.club2 = c2.club_id
+      WHERE 
+        hm.match_id = ?;
+    `;
+
+    const [rows] = await pool.promise().query(query, [matchId]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "Match not found" });
+    }
+
+    res.json({ match: rows[0] });
+  } catch (error) {
+    console.error("Error fetching match:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
 
 //register an admin
 router.post('/register',isAuth,isAutho([1]), async (req, res) => {
@@ -684,6 +748,89 @@ router.post('/login', async (req, res) => {
     return res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+//get match players
+router.get('/match/players/:match_id', isAuth, isAutho([1, 2, 3]), async (req, res) => {
+  try {
+    const matchId = parseInt(req.params.match_id);
+
+    if (isNaN(matchId)) {
+      return res.status(400).json({ error: "Invalid match ID" });
+    }
+
+    const query = `
+      SELECT 
+        mp.*,
+        p.player_name
+      FROM 
+        match_player_performance mp
+      LEFT JOIN 
+        player p ON mp.player_id = p.player_id
+      WHERE 
+        mp.match_id = ?;
+    `;
+
+    const [rows] = await pool.promise().query(query, [matchId]);
+
+    res.json({ players: rows });
+  } catch (error) {
+    console.error("Error fetching match players:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+//get club players
+
+router.get('/club/players/:club_id', isAuth, isAutho([1, 2, 3]), async (req, res) => {
+  try {
+    const clubId = parseInt(req.params.club_id);
+
+    if (isNaN(clubId)) {
+      return res.status(400).json({ error: "Invalid club ID" });
+    }
+
+    const query = `
+      SELECT 
+        p.player_name,
+        p.player_id,
+        c.club_name
+      FROM 
+        player p
+      LEFT JOIN 
+        club c ON p.club_id = c.club_id
+      WHERE 
+        p.club_id = ?;
+    `;
+
+    const [rows] = await pool.promise().query(query, [clubId]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "No players found for this club" });
+    }
+
+    res.json({ players: rows });
+  } catch (error) {
+    console.error("Error fetching club players:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+})
+
+// post performance player
+router.post('/match/player-performance', isAuth, isAutho([1, 2]), async (req, res) => {
+  try {
+    const {match_id, player_id} = req.body;
+    const query = `
+      INSERT INTO match_player_performance (match_id, player_id)
+      VALUES (?, ?)
+    `;
+    await pool.promise().query(query, [match_id, player_id]); 
+    res.status(201).json({ message: "Player performance added successfully" });         
+  }
+  catch (error) {
+    console.error("Error adding player performance:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+})
 
 async function getUserByEmail(email) {
   const [result] = await pool.promise().query('SELECT * FROM admin_account WHERE email = ?', [email]);

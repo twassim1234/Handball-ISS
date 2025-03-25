@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import pic1 from "../Assets/Matche/match.jpg";
 import { Link } from "react-router-dom";
 import AuthenticationLayout from "../Layouts/AuthenticationLayout";
 import { useContext } from "react";
 import { UserContext } from "../Contexts/UserContext";
+import axios from "axios";
 
 const initialMatches = [
   {
@@ -39,13 +40,23 @@ export default function MatchList() {
   const [imagePreview, setImagePreview] = useState("");
   const { user } = useContext(UserContext);
 
+  const fetchMatches = async () => {
+    const response = await axios.get("http://localhost:8000/matches");
+    console.log(response);
+    setMatches(response.data.matches);
+  }
+
+  useEffect(() => {
+    if(!user) return;
+    fetchMatches();
+  },[user]);
+
   const [newMatch, setNewMatch] = useState({
     team1: "",
     team2: "",
     address: "",
     date: "",
     image: "",
-    status: "new",
   });
 
   const filteredMatches = matches.filter(
@@ -136,18 +147,18 @@ export default function MatchList() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
   {filteredMatches.map((match) => (
-    <Link to={`/match/${match.id}`} key={match.id} onClick={handleMatchClick} className="p-4 border rounded-lg shadow-md bg-white cursor-pointer">
+    <Link to={`/match/${match.match_id}`} key={match.match_id} onClick={handleMatchClick} className="p-4 border rounded-lg shadow-md bg-white cursor-pointer">
       <div className="flex justify-center items-center">
         <img
           src={match.image}
-          alt={`${match.teams[0]} vs ${match.teams[1]}`}
+          alt={`${match.club1_name} vs ${match.club2_name}`}
           className=" lg:w-fit lg:h-60 w-80 h-40 object-cover rounded-lg"
         />
       </div>
       <div className="p-2">
-        <h2 className="text-xl font-bold text-center">{match.teams[0]} vs {match.teams[1]}</h2>
-        <p className="text-gray-500 text-center">{match.address}</p>
-        <p className="text-sm mt-1 text-gray-400 text-center">Date: {match.date}</p>
+        <h2 className="text-xl font-bold text-center">{match.club1_name} vs {match.club2_name}</h2>
+        <p className="text-gray-500 text-center">{match.match_city}</p>
+        <p className="text-sm mt-1 text-gray-400 text-center">Date: {match.match_date}</p>
       </div>
     </Link>
   ))}
