@@ -59,7 +59,7 @@ WHERE club_name = 'Handball Club B';
 INSERT INTO club (club_name, club_picture, club_details, extra_details, club_admin_id) 
 VALUES 
   ('Handball Club A', 'images/clubA.jpg', 'A top-tier handball club', 'Has won multiple championships', 2);
-
+select * from club;
 -- Insert Highlights for Clubs
 INSERT INTO club_highlight (club_id, highlight_text) 
 VALUES 
@@ -96,9 +96,9 @@ CREATE TABLE player_highlight (
 -- Insert Players into Clubs
 INSERT INTO player (player_name, height, reference, image, birthday, place_of_birth, description, position, qualified, club_id) 
 VALUES 
-  ('John Doe', 185, 'JD123', 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Khalil_Chemmam.jpg/1024px-Khalil_Chemmam.jpg', '1998-05-12', 'Los Angeles, USA', 'A talented goalkeeper', 'Goalkeeper', TRUE, 10),
-  ('Jane Smith', 175, 'JS567', 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Khalil_Chemmam.jpg/1024px-Khalil_Chemmam.jpg', '2000-08-23', 'Paris, France', 'A quick and agile left-wing', 'Left Wing', TRUE, 10),
-  ('Michael Johnson', 188, 'MJ890', 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Khalil_Chemmam.jpg/1024px-Khalil_Chemmam.jpg', '1995-02-10', 'Berlin, Germany', 'A strong center-back', 'Center Back', TRUE, 10);
+  ('John Doe', 185, 'JD123', 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Khalil_Chemmam.jpg/1024px-Khalil_Chemmam.jpg', '1998-05-12', 'Los Angeles, USA', 'A talented goalkeeper', 'Goalkeeper', TRUE, 1),
+  ('Jane Smith', 175, 'JS567', 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Khalil_Chemmam.jpg/1024px-Khalil_Chemmam.jpg', '2000-08-23', 'Paris, France', 'A quick and agile left-wing', 'Left Wing', TRUE, 2),
+  ('Michael Johnson', 188, 'MJ890', 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Khalil_Chemmam.jpg/1024px-Khalil_Chemmam.jpg', '1995-02-10', 'Berlin, Germany', 'A strong center-back', 'Center Back', TRUE, 1);
 
 -- Insert Highlights for Players
 INSERT INTO player_highlight (player_id, highlight_text) 
@@ -114,15 +114,19 @@ CREATE TABLE handball_match (
     match_id INT AUTO_INCREMENT PRIMARY KEY,
     match_date DATETIME NOT NULL,
     match_location VARCHAR(100) NOT NULL,
+    match_city VARCHAR(100) NOT NULL,
     referee_id INT,
+    image_url VARCHAR(100),
     FOREIGN KEY (referee_id) REFERENCES admin_account(admin_id) ON DELETE SET NULL
 );
 
+select * from handball_match;
+
 -- Insert Handball Matches
-INSERT INTO handball_match (match_date, match_location, referee_id) 
+INSERT INTO handball_match (match_date, match_location,match_city,referee_id) 
 VALUES 
-  ('2025-03-10 18:00:00', 'Stadium A', 3),
-  ('2025-03-12 20:00:00', 'Stadium B', 3);
+  ('2025-03-10 18:00:00', 'Stadium A', 'manouba', 3),
+  ('2025-03-12 20:00:00', 'Stadium B', 'tunis', 3);
 
 -- ================= PLAYED MATCH TABLE =================
 CREATE TABLE played_match (
@@ -212,6 +216,10 @@ ADD COLUMN spectators_count INT;
 
 
 
+
+
+select *from handball_match;
+
 -- ================= MATCH TEAM STATS TABLE =================
 CREATE TABLE match_team_stats (
     match_id INT NOT NULL,
@@ -244,6 +252,7 @@ CREATE TABLE match_player_performance (
     FOREIGN KEY (player_id) REFERENCES player(player_id) ON DELETE CASCADE
 );
 
+select * from match_player_performance;
 -- ================= MATCH REFEREES TABLE =================
 CREATE TABLE match_referees (
     match_id INT NOT NULL,
@@ -264,5 +273,26 @@ CREATE TABLE match_notes (
 );
 INSERT INTO club (club_name, club_picture, club_details, extra_details, club_admin_id) 
 VALUES 
- 
+
   ('Handball Club C', 'images/clubC.png', 'An emerging handball club', 'Has a strong youth program', 2);
+  
+  
+INSERT INTO club (club_name, club_picture, club_details, extra_details, club_admin_id) 
+VALUES 
+
+  ('Handball Club D', 'images/clubD.png', 'An emerging handball club', 'Has a strong youth program', 1);
+  
+  
+INSERT INTO club (club_name, club_picture, club_details, extra_details, club_admin_id) 
+VALUES 
+
+  ('Handball Club B', 'images/clubB.png', 'An emerging handball club', 'Has a strong youth program', 3);
+  select * from handball_match;
+  
+ALTER TABLE handball_match
+ADD COLUMN club1 INT,
+ADD COLUMN club2 INT,
+ADD CONSTRAINT fk_club1 FOREIGN KEY (club1) REFERENCES club(club_id) ON DELETE CASCADE,
+ADD CONSTRAINT fk_club2 FOREIGN KEY (club2) REFERENCES club(club_id) ON DELETE CASCADE;
+
+select * from handball_match;

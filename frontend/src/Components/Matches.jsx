@@ -6,35 +6,9 @@ import { useContext } from "react";
 import { UserContext } from "../Contexts/UserContext";
 import axios from "axios";
 
-const initialMatches = [
-  {
-    id: 1,
-    teams: ["Team A", "Team B"],
-    address: "rades",
-    image: pic1,
-    status: "new",
-    date: "2025-02-12",
-  },
-  {
-    id: 2,
-    teams: ["Team C", "Team D"],
-    address: "rades",
-    image: pic1,
-    status: "old",
-    date: "2025-02-10",
-  },
-  {
-    id: 3,
-    teams: ["Team E", "Team F"],
-    address: "rades",
-    image: pic1,
-    status: "new",
-    date: "2025-02-11",
-  },
-];
 
 export default function MatchList() {
-  const [matches, setMatches] = useState(initialMatches);
+  const [matches, setMatches] = useState([]);
   const [filter, setFilter] = useState("all");
   const [showForm, setShowForm] = useState(false);
   const [imagePreview, setImagePreview] = useState("");
@@ -55,6 +29,7 @@ export default function MatchList() {
     team1: "",
     team2: "",
     address: "",
+    city: "",
     date: "",
     image: "",
   });
@@ -83,27 +58,27 @@ export default function MatchList() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (newMatch.team1 && newMatch.team2 && newMatch.address && newMatch.date) {
-      const newMatchObj = {
-        ...newMatch,
-        teams: [newMatch.team1, newMatch.team2],
-        id: matches.length + 1,
-      };
-      setMatches([...matches, newMatchObj]);
-      setNewMatch({
-        team1: "",
-        team2: "",
-        address: "",
-        date: "",
-        status: "new",
-        image: "",
+
+    const form = e.target;
+  
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+    try {
+      const response = await axios.post("http://localhost:8000/matches", data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
-      setImagePreview(""); 
-      setShowForm(false);
-    } else {
-      alert("Please fill out all fields.");
+  
+      if (response.status === 201) {
+        location.reload();
+        alert("Match added successfully!");
+      }
+    } catch (error) {
+      console.error("Error adding match:", error);
+      alert("Failed to add match. Please try again.");
     }
   };
 
@@ -178,23 +153,27 @@ export default function MatchList() {
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
               <label className="block mb-2">Team 1 Name</label>
-              <input type="text" name="team1" value={newMatch.team1} onChange={handleInputChange} className="w-full p-2 border rounded" required />
+              <input type="text" name="club1"   className="w-full p-2 border rounded" required />
             </div>
             <div className="mb-4">
               <label className="block mb-2">Team 2 Name</label>
-              <input type="text" name="team2" value={newMatch.team2} onChange={handleInputChange} className="w-full p-2 border rounded" required />
+              <input type="text" name="club2" className="w-full p-2 border rounded" required />
             </div>
             <div className="mb-4">
               <label className="block mb-2">Address</label>
-              <input type="text" name="address" value={newMatch.address} onChange={handleInputChange} className="w-full p-2 border rounded" required />
+              <input type="text" name="match_location"  className="w-full p-2 border rounded" required />
+            </div>
+            <div className="mb-4">
+              <label className="block mb-2">City</label>
+              <input type="text" name="match_city" className="w-full p-2 border rounded" required />
             </div>
             <div className="mb-4">
               <label className="block mb-2">Date</label>
-              <input type="date" name="date" value={newMatch.date} onChange={handleInputChange} className="w-full p-2 border rounded" required />
+              <input type="datetime-local" name="match_date" className="w-full p-2 border rounded" required />
             </div>
             <div className="mb-4">
               <label className="block mb-2">Image</label>
-              <input type="file" onChange={handleImageChange} className="w-full p-2 border rounded" />
+              <input type="file" name="image_url" onChange={handleImageChange} className="w-full p-2 border rounded" />
               {imagePreview && <img src={imagePreview} alt="Preview" className="mt-2 h-40 object-cover rounded-lg" />}
             </div>
             <div className="mb-4">
