@@ -7,6 +7,7 @@ const isAutho = require('./isAutho');
 
 const multer = require("multer");
 const path = require("path");
+const { match } = require('assert');
 
 // Set up storage
 const storage = multer.diskStorage({
@@ -612,6 +613,49 @@ router.get('/matches', isAuth, isAutho([1, 2, 3]), async (req, res) => {
   }
 });
 
+// Add a new match + add image upload
+router.post('/matches', isAuth, isAutho([1,3]), upload.single("image_url"), async (req, res) => {
+  const {club1, club2, match_city,match_location, match_date} = req.body;
+  console.log(req.body)
+  const referee_id = req.user.role == 3? req.user.id : null;
+  try {
+    const query = `
+      INSERT INTO handball_match (club1, club2, match_city, match_date, referee_id, match_location)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `;
+    const [result] = await pool.promise().query(query, [club1, club2, match_city, match_date, referee_id, match_location]);
+    res.status(201).json({ message: "Match added successfully", match_id: result.insertId });
+
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({message: "Error occured, try again"})
+  }
+
+}
+);
+
+
+//update match details
+router.put('/matches/:id', isAuth, isAutho([1, 3]), async (req, res) => {
+  try {
+    const matchId = parseInt(req.params.id);
+    const {match_city, match_date, referee_id, match_location, match_status, match_duration, spectators_count } = req.body;
+
+
+    const query = `UPDATE handball_match SET match_city = ?, match_date = ?, referee_id = ?, match_location = ?, match_status = ?, match_duration = ?, spectators_count = ? WHERE match_id = ?`;
+    const [result] = await pool.promise().query(query, [match_city, match_date, referee_id, match_location, match_status, match_duration, spectators_count, matchId]);
+    
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "Match not found" });
+    }
+
+    res.json({ message: "Match updated successfully" });
+  } catch (error) {
+    console.error("Error updating match:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 // Get a match by ID
 router.get('/matches/:id', isAuth, isAutho([1, 2, 3]), async (req, res) => {
   try {
@@ -819,6 +863,8 @@ router.put('/match/performance', isAuth, isAutho([1, 2, 3]), async (req, res) =>
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+
 
 
 
