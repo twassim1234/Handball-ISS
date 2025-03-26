@@ -779,6 +779,49 @@ router.get('/match/players/:match_id', isAuth, isAutho([1, 2, 3]), async (req, r
   }
 });
 
+// update match performance player(to be updated with correct perf columns)
+
+router.put('/match/performance', isAuth, isAutho([1, 2, 3]), async (req, res) => {
+  try {
+    const {match_id, player_id, ...performanceData} = req.body;
+
+    if (!match_id || !player_id) {
+      return res.status(400).json({ error: "Match ID and player ID are required" });
+    }
+
+    const {club_id} = await getPlayerById(player_id);
+    const {goals_scored, assists} = await getPlayerPerformanceById(player_id);
+    const goals_scored_diff = performanceData.goals_scored - goals_scored;
+
+    const MatchPerformanceQuery = `
+      UPDATE match_player_performance
+      SET goals_scored = ?, assists = ?
+      WHERE match_id = ? AND player_id = ?;
+    `;
+    const [result] = await pool.promise().query(MatchPerformanceQuery, [performanceData.goals_scored,performanceData.assists, match_id, player_id]);
+
+    const MatchStatsQuery = `
+      UPDATE match_team_stats
+      SET total_goals = total_goals + ?
+      WHERE match_id = ? AND club_id = ?;
+    `;
+    await pool.promise().query(MatchStatsQuery, [goals_scored_diff, match_id, club_id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "Player performance not found" });
+    }
+
+    res.json({ message: "Player performance updated successfully" })
+
+    
+  } catch (error) {
+    console.error("Error updating player performance:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+
+
 //get club players
 
 router.get('/club/players/:club_id', isAuth, isAutho([1, 2, 3]), async (req, res) => {
@@ -839,6 +882,16 @@ async function getUserByEmail(email) {
 
 async function getUserById(id) {
   const [result] = await pool.promise().query('SELECT * FROM admin_account WHERE admin_id = ?', [id]);
+  return result[0];
+}
+
+async function getPlayerById(id){
+  const [result] = await pool.promise().query('SELECT * FROM player WHERE player_id = ?', [id]);
+  return result[0];
+}
+
+async function getPlayerPerformanceById(id) {
+  const [result] = await pool.promise().query('SELECT * FROM match_player_performance WHERE player_id = ?', [id]);
   return result[0];
 }
 
