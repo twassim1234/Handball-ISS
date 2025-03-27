@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import pic1 from "../Assets/Matche/match.jpg";
 import { Link } from "react-router-dom";
 import AuthenticationLayout from "../Layouts/AuthenticationLayout";
@@ -26,13 +26,16 @@ export default function MatchList() {
   },[user]);
 
   const [newMatch, setNewMatch] = useState({
-    team1: "",
-    team2: "",
-    address: "",
-    city: "",
-    date: "",
-    image: "",
+    club1: "",
+    club2: "",
+    match_location: "",
+    match_city: "",
+    match_date: "",
+    status: "new",
+    image_url: "",
   });
+  
+  
 
   const filteredMatches = matches.filter(
     (match) => filter === "all" || match.status === filter
@@ -61,8 +64,11 @@ export default function MatchList() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    const formData = new FormData(e.target);
-    
+    const formData = new FormData();
+    for (const key in newMatch) {
+      formData.append(key, newMatch[key]);
+    }
+
     try {
       const response = await axios.post("http://localhost:8000/matches", formData, {
         headers: {
@@ -86,19 +92,20 @@ export default function MatchList() {
   const handleAddGame = () => {
     setShowForm(true);
   };
-
-  const handleCancel = () => {
+const handleCancel = () => {
     setShowForm(false);
     setNewMatch({
-      team1: "",
-      team2: "",
-      address: "",
-      date: "",
+      club1: "",
+      club2: "",
+      match_location: "",
+      match_city: "",
+      match_date: "",
       status: "new",
-      image: "",
+      image_url: "",
     });
-    setImagePreview(""); 
+    setImagePreview("");
   };
+
 
   const handleMatchClick=(event)=>{
     if(!user){
@@ -108,18 +115,21 @@ export default function MatchList() {
 
   return (
     <AuthenticationLayout>
-    <div className="p-6 md:p-8 lg:p-22">
-      <div className="flex gap-2 mb-6">
-        <button onClick={() => setFilter("all")} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-800 transition">
-          All Matches
-        </button>
-        <button onClick={() => setFilter("new")} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-800 transition">
-          New Matches
-        </button>
-        <button onClick={() => setFilter("old")} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-800 transition">
-          Old Matches
-        </button>
-      </div>
+     <div className="p-6 md:p-8 lg:p-22">
+        {/* Filter Buttons */}
+        <div className="flex gap-2 mb-6">
+          {["all", "new", "old"].map((status) => (
+            <button
+              key={status}
+              onClick={() => setFilter(status)}
+              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-800 transition"
+            >
+              {status === "all" ? "All Matches" : status === "new" ? "New Matches" : "Old Matches"}
+            </button>
+          ))}
+        </div>
+
+
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
   {filteredMatches.map((match) => (
@@ -152,31 +162,51 @@ export default function MatchList() {
         <div className="mt-8 p-6 border rounded-lg shadow-md bg-white">
           <h3 className="text-xl font-bold mb-4">Add New Match</h3>
           <form onSubmit={handleSubmit}>
-            <div className="mb-4">
-              <label className="block mb-2">Team 1 ID</label>
-              <input type="text" name="club1"   className="w-full p-2 border rounded" required />
-            </div>
-            <div className="mb-4">
-              <label className="block mb-2">Team 2 ID</label>
-              <input type="text" name="club2" className="w-full p-2 border rounded" required />
-            </div>
+
+          <div className="mb-4">
+        <label className="block mb-2">Team 1</label>
+        <select name="club1" className="w-full p-2 border rounded" required>
+          <option value="">Select a team</option>
+          {teams.map((team) => (
+            <option key={team.club_id} value={team.club_id}>
+              {team.club_name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="mb-4">
+        <label className="block mb-2">Team 2</label>
+        <select name="club2" className="w-full p-2 border rounded" required>
+          <option value="">Select a team</option>
+          {teams.map((team) => (
+            <option key={team.club_id} value={team.club_id}>
+              {team.club_name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+
+
             <div className="mb-4">
               <label className="block mb-2">Address</label>
-              <input type="text" name="match_location"  className="w-full p-2 border rounded" required />
+              <input type="text" name="match_location" value={newMatch.match_location} onChange={handleInputChange}  className="w-full p-2 border rounded" required />
             </div>
             <div className="mb-4">
               <label className="block mb-2">City</label>
-              <input type="text" name="match_city" className="w-full p-2 border rounded" required />
+              <input type="text" name="match_city" value={newMatch.match_city} onChange={handleInputChange} className="w-full p-2 border rounded" required />
             </div>
             <div className="mb-4">
               <label className="block mb-2">Date</label>
-              <input type="datetime-local" name="match_date" className="w-full p-2 border rounded" required />
-            </div>
+              <input type="datetime-local" name="match_date" value={newMatch.match_date} onChange={handleInputChange} className="w-full p-2 border rounded" required />
+              </div>
             <div className="mb-4">
               <label className="block mb-2">Image</label>
               <input 
                 type="file" 
                 name="image_url" 
+                value={newMatch.image_url}
                 onChange={handleImageChange} 
                 accept="image/*"
                 required
@@ -186,8 +216,9 @@ export default function MatchList() {
             <div className="mb-4">
               <label className="block mb-2">Status</label>
               <select name="status" value={newMatch.status} onChange={handleInputChange} className="w-full p-2 border rounded">
-                <option value="new">New</option>
-                <option value="old">Old</option>
+                <option value="new">Scheduled</option>
+                <option value="new">Ongoing </option>
+                <option value="old">Finished</option>
               </select>
             </div>
             <div className="flex justify-between">
