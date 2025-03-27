@@ -615,24 +615,49 @@ router.get('/matches', isAuth, isAutho([1, 2, 3]), async (req, res) => {
 
 // Add a new match + add image upload
 router.post('/matches', isAuth, isAutho([1,3]), upload.single("image_url"), async (req, res) => {
-  const {club1, club2, match_city,match_location, match_date} = req.body;
-  console.log(req.body)
-  const referee_id = req.user.role == 3? req.user.id : null;
   try {
+    console.log("Request body:", req.body);
+    console.log("Uploaded file:", req.file);
+
+    const { club1, club2, match_city, match_location, match_date } = req.body;
+    const referee_id = req.user.role == 3 ? req.user.id : null;
+    
+    if (!req.file) {
+      return res.status(400).json({ error: "Match image is required" });
+    }
+
+    const image_url = req.file.filename;
+
     const query = `
-      INSERT INTO handball_match (club1, club2, match_city, match_date, referee_id, match_location)
-      VALUES (?, ?, ?, ?, ?, ?)
+      INSERT INTO handball_match 
+        (club1, club2, match_city, match_date, referee_id, match_location, image_url)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
-    const [result] = await pool.promise().query(query, [club1, club2, match_city, match_date, referee_id, match_location]);
-    res.status(201).json({ message: "Match added successfully", match_id: result.insertId });
+    
+    const [result] = await pool.promise().query(query, [
+      club1, 
+      club2, 
+      match_city, 
+      match_date, 
+      referee_id, 
+      match_location, 
+      image_url
+    ]);
+
+    res.status(201).json({ 
+      message: "Match added successfully", 
+      match_id: result.insertId,
+      image_url: image_url
+    });
 
   } catch (error) {
-    console.log(error)
-    res.status(500).json({message: "Error occured, try again"})
+    console.error("Detailed error:", error);
+    res.status(500).json({ 
+      error: "Failed to add match",
+      details: error.message
+    });
   }
-
-}
-);
+});
 
 
 //update match details

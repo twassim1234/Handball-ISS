@@ -60,25 +60,26 @@ export default function MatchList() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const form = e.target;
-  
-    const formData = new FormData(form);
-    const data = Object.fromEntries(formData.entries());
+    
+    const formData = new FormData(e.target);
+    
     try {
-      const response = await axios.post("http://localhost:8000/matches", data, {
+      const response = await axios.post("http://localhost:8000/matches", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
   
+      console.log("Full response:", response); // Debug log
+      
       if (response.status === 201) {
-        location.reload();
-        alert("Match added successfully!");
+        alert(`Match added successfully! Image URL: ${response.data.image_url}`);
+        fetchMatches(); // Refresh the matches list
+        setShowForm(false); // Close the form
       }
     } catch (error) {
-      console.error("Error adding match:", error);
-      alert("Failed to add match. Please try again.");
+      console.error("Detailed error:", error.response?.data || error);
+      alert(`Failed to add match: ${error.response?.data?.error || error.message}`);
     }
   };
 
@@ -125,9 +126,9 @@ export default function MatchList() {
     <Link to={`/match/${match.match_id}`} key={match.match_id} onClick={handleMatchClick} className="p-4 border rounded-lg shadow-md bg-white cursor-pointer">
       <div className="flex justify-center items-center">
         <img
-          src={match.image}
+          src={match.image_url ? `http://localhost:8000/uploads/${match.image_url}` : pic1}
           alt={`${match.club1_name} vs ${match.club2_name}`}
-          className=" lg:w-fit lg:h-60 w-80 h-40 object-cover rounded-lg"
+          className="lg:w-fit lg:h-60 w-80 h-40 object-cover rounded-lg"
         />
       </div>
       <div className="p-2">
@@ -152,11 +153,11 @@ export default function MatchList() {
           <h3 className="text-xl font-bold mb-4">Add New Match</h3>
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
-              <label className="block mb-2">Team 1 Name</label>
+              <label className="block mb-2">Team 1 ID</label>
               <input type="text" name="club1"   className="w-full p-2 border rounded" required />
             </div>
             <div className="mb-4">
-              <label className="block mb-2">Team 2 Name</label>
+              <label className="block mb-2">Team 2 ID</label>
               <input type="text" name="club2" className="w-full p-2 border rounded" required />
             </div>
             <div className="mb-4">
@@ -173,7 +174,13 @@ export default function MatchList() {
             </div>
             <div className="mb-4">
               <label className="block mb-2">Image</label>
-              <input type="file" name="image_url" onChange={handleImageChange} className="w-full p-2 border rounded" />
+              <input 
+                type="file" 
+                name="image_url" 
+                onChange={handleImageChange} 
+                accept="image/*"
+                required
+              className="w-full p-2 border rounded" />
               {imagePreview && <img src={imagePreview} alt="Preview" className="mt-2 h-40 object-cover rounded-lg" />}
             </div>
             <div className="mb-4">
