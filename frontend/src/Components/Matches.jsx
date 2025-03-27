@@ -165,7 +165,7 @@ const handleCancel = () => {
 
           <div className="mb-4">
         <label className="block mb-2">Team 1</label>
-        <select name="club1" className="w-full p-2 border rounded" required>
+        <select name="club1" value={newMatch.club1} onChange={handleInputChange} className="w-full p-2 border rounded" required>
           <option value="">Select a team</option>
           {teams.map((team) => (
             <option key={team.club_id} value={team.club_id}>
@@ -173,11 +173,12 @@ const handleCancel = () => {
             </option>
           ))}
         </select>
+      
       </div>
 
       <div className="mb-4">
         <label className="block mb-2">Team 2</label>
-        <select name="club2" className="w-full p-2 border rounded" required>
+        <select name="club2" value={newMatch.club2} onChange={handleInputChange} className="w-full p-2 border rounded" required>
           <option value="">Select a team</option>
           {teams.map((team) => (
             <option key={team.club_id} value={team.club_id}>
