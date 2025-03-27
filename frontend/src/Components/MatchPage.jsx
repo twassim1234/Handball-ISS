@@ -38,13 +38,21 @@ export default function MatchPage() {
       fetchMatch();
     },[user]);
 
+    // Construct the image URL
+  const getImageUrl = () => {
+    if (!match?.image_url) return pic1;
+    return `http://localhost:8000/uploads/${match.image_url}`;
+  };
+
   
 
   return (
     <AuthenticationLayout requiresAuth allowedRoles={[1,2,3]}>
     {match?<div className="p-4 lg:p-22">
       <h1 className=" flex justify-center text-4xl font-bold mb-4">Match Details</h1>
-      <img src={match.image_url} alt={`${match.club1_name} vs ${match.club2_name}`} className=" w-full h-full flex items-center  object-cover rounded-b-4xl" />
+      <img src={getImageUrl()} alt={`${match.club1_name} vs ${match.club2_name}`} className=" w-full h-full flex items-center  object-cover rounded-b-4xl"  onError={(e) => {
+              e.target.src = pic1; // Fallback to default image if error
+            }}/>
 
       <MatchDetails/>
       <ListOfPlayers match_id={match.match_id} club1_id={match.club1} club2_id={match.club2} club1_name={match.club1_name} club2_name={match.club2_name}/>
