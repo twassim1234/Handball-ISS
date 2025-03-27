@@ -2,7 +2,7 @@
 
 ## Description
 
-Handball-ISS 
+This project is designed to digitize the inefficient paper-based processes and optimize critical handball management processes, including player acquisition, match organization, and result recording. It features a web-based interface that enables stakeholders to manage clubs, validate player qualifications, organize matches, and generate match sheets automatically
 
 ## Features
 
