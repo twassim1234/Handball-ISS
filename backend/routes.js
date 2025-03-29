@@ -848,6 +848,35 @@ router.get('/match/players/:match_id', isAuth, isAutho([1, 2, 3]), async (req, r
   }
 });
 
+//delete match player
+
+router.delete('/match/player-performance/:match_id/:player_id', isAuth, isAutho([1, 2]), async (req, res) => {
+  try {
+    const matchId = parseInt(req.params.match_id);
+    const playerId = parseInt(req.params.player_id);
+
+    if (isNaN(matchId) || isNaN(playerId)) {
+      return res.status(400).json({ error: "Invalid match ID or player ID" });
+    }
+
+    const query = `
+      DELETE FROM match_player_performance 
+      WHERE match_id = ? AND player_id = ?;
+    `;
+
+    const [result] = await pool.promise().query(query, [matchId, playerId]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "Player performance not found" });
+    }
+
+    res.json({ message: "Player performance deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting player performance:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+})
+
 // update match performance player(to be updated with correct perf columns)
 
 router.put('/match/performance', isAuth, isAutho([1, 2, 3]), async (req, res) => {

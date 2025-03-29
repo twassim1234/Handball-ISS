@@ -13,11 +13,13 @@ const ListOfPlayers = ({club1_name, club2_name, club1_id, club2_id, match_id}) =
 
   const handlePlayerAdd = async (player_id) => {
     try {
+      console.log(player_id)
       await axios.post(`http://localhost:8000/match/player-performance`, {
         match_id: match_id,
         player_id: player_id,
       })
-      await fetchMatchPlayers()
+      const result = await fetchMatchPlayers()
+      setMatchPlayers(result.players)
     } catch (error) {
       console.log(error)
     }
@@ -59,6 +61,16 @@ const ListOfPlayers = ({club1_name, club2_name, club1_id, club2_id, match_id}) =
       await axios.put(`http://localhost:8000/match/performance`, player)
     }
     catch (error) {
+      console.log(error)
+    }
+  }
+
+  const handleDeletePlayer = async (player_id) =>{
+    try {
+      await axios.delete(`http://localhost:8000/match/player-performance/${match_id}/${player_id}`)
+      const result = await fetchMatchPlayers()
+      setMatchPlayers(result.players)
+    } catch (error) {
       console.log(error)
     }
   }
@@ -177,7 +189,7 @@ const ListOfPlayers = ({club1_name, club2_name, club1_id, club2_id, match_id}) =
                       >
                         💾
                       </button>
-                      <button className="cursor-pointer" title="delete">
+                      <button className="cursor-pointer" title="delete" onClick={() => handleDeletePlayer(player.player_id)}>
                         ✘
                       </button>
                     </td>
@@ -190,7 +202,8 @@ const ListOfPlayers = ({club1_name, club2_name, club1_id, club2_id, match_id}) =
               className="w-96 p-1 border rounded"
               onChange={(e) => setClub1SelectedPlayer(e.target.value)}
             >
-              {club1_players.map((player) => (
+              <option value="">Select Player</option>
+              {club1_players.filter(player=>!match_players.find(p=>p.player_id===player.player_id)).map((player) => (
                 <option value={player.player_id}>{player.player_name}</option>
               ))}
             </select>
