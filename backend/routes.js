@@ -7,6 +7,7 @@ const isAutho = require('./isAutho');
 
 const multer = require("multer");
 const path = require("path");
+const { match } = require('assert');
 
 // Set up storage
 const storage = multer.diskStorage({
@@ -582,8 +583,140 @@ router.put('/qualification-request/:request_id/status',isAuth,isAutho([1]), asyn
 
 //match
 
+// Get all matches
+// Get all matches with club names
+router.get('/matches', isAuth, isAutho([1, 2, 3]), async (req, res) => {
+  try {
+    const query = `
+      SELECT 
+        hm.*,
+        c1.club_name AS club1_name,
+        c2.club_name AS club2_name
+      FROM 
+        handball_match hm
+      LEFT JOIN 
+        club c1 ON hm.club1 = c1.club_id
+      LEFT JOIN 
+        club c2 ON hm.club2 = c2.club_id;
+    `;
+
+    const [rows] = await pool.promise().query(query);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "No matches found" });
+    }
+
+    res.json({ matches: rows });
+  } catch (error) {
+    console.error("Error fetching matches:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// Add a new match + add image upload
+router.post('/matches', isAuth, isAutho([1,3]), upload.single("image_url"), async (req, res) => {
+  try {
+    console.log("Request body:", req.body);
+    console.log("Uploaded file:", req.file);
+
+    const { club1, club2, match_city, match_location, match_date } = req.body;
+    const referee_id = req.user.role == 3 ? req.user.id : null;
+    
+    if (!req.file) {
+      return res.status(400).json({ error: "Match image is required" });
+    }
+
+    const image_url = req.file.filename;
+
+    const query = `
+      INSERT INTO handball_match 
+        (club1, club2, match_city, match_date, referee_id, match_location, image_url)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
+    
+    const [result] = await pool.promise().query(query, [
+      club1, 
+      club2, 
+      match_city, 
+      match_date, 
+      referee_id, 
+      match_location, 
+      image_url
+    ]);
+
+    res.status(201).json({ 
+      message: "Match added successfully", 
+      match_id: result.insertId,
+      image_url: image_url
+    });
+
+  } catch (error) {
+    console.error("Detailed error:", error);
+    res.status(500).json({ 
+      error: "Failed to add match",
+      details: error.message
+    });
+  }
+});
 
 
+//update match details
+router.put('/matches/:id', isAuth, isAutho([1, 3]), async (req, res) => {
+  try {
+    const matchId = parseInt(req.params.id);
+    const {match_city, match_date, referee_id, match_location, match_status, match_duration, spectators_count } = req.body;
+
+
+    const query = `UPDATE handball_match SET match_city = ?, match_date = ?, referee_id = ?, match_location = ?, match_status = ?, match_duration = ?, spectators_count = ? WHERE match_id = ?`;
+    const [result] = await pool.promise().query(query, [match_city, match_date, referee_id, match_location, match_status, match_duration, spectators_count, matchId]);
+    
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "Match not found" });
+    }
+
+    res.json({ message: "Match updated successfully" });
+  } catch (error) {
+    console.error("Error updating match:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// Get a match by ID
+router.get('/matches/:id', isAuth, isAutho([1, 2, 3]), async (req, res) => {
+  try {
+    const matchId = parseInt(req.params.id);
+
+    if (isNaN(matchId)) {
+      return res.status(400).json({ error: "Invalid match ID" });
+    }
+
+    const query = `
+      SELECT 
+        hm.*,
+        c1.club_name AS club1_name,
+        c2.club_name AS club2_name
+      FROM 
+        handball_match hm
+      LEFT JOIN 
+        club c1 ON hm.club1 = c1.club_id
+      LEFT JOIN 
+        club c2 ON hm.club2 = c2.club_id
+      WHERE 
+        hm.match_id = ?;
+    `;
+
+    const [rows] = await pool.promise().query(query, [matchId]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "Match not found" });
+    }
+
+    res.json({ match: rows[0] });
+  } catch (error) {
+    console.error("Error fetching match:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
 
 //register an admin
 router.post('/register',isAuth,isAutho([1]), async (req, res) => {
@@ -685,6 +818,163 @@ router.post('/login', async (req, res) => {
   }
 });
 
+//get match players
+router.get('/match/players/:match_id', isAuth, isAutho([1, 2, 3]), async (req, res) => {
+  try {
+    const matchId = parseInt(req.params.match_id);
+
+    if (isNaN(matchId)) {
+      return res.status(400).json({ error: "Invalid match ID" });
+    }
+
+    const query = `
+      SELECT 
+        mp.*,
+        p.player_name
+      FROM 
+        match_player_performance mp
+      LEFT JOIN 
+        player p ON mp.player_id = p.player_id
+      WHERE 
+        mp.match_id = ?;
+    `;
+
+    const [rows] = await pool.promise().query(query, [matchId]);
+
+    res.json({ players: rows });
+  } catch (error) {
+    console.error("Error fetching match players:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+//delete match player
+
+router.delete('/match/player-performance/:match_id/:player_id', isAuth, isAutho([1, 2]), async (req, res) => {
+  try {
+    const matchId = parseInt(req.params.match_id);
+    const playerId = parseInt(req.params.player_id);
+
+    if (isNaN(matchId) || isNaN(playerId)) {
+      return res.status(400).json({ error: "Invalid match ID or player ID" });
+    }
+
+    const query = `
+      DELETE FROM match_player_performance 
+      WHERE match_id = ? AND player_id = ?;
+    `;
+
+    const [result] = await pool.promise().query(query, [matchId, playerId]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "Player performance not found" });
+    }
+
+    res.json({ message: "Player performance deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting player performance:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+})
+
+// update match performance player(to be updated with correct perf columns)
+
+router.put('/match/performance', isAuth, isAutho([1, 2, 3]), async (req, res) => {
+  try {
+    const {match_id, player_id, ...performanceData} = req.body;
+
+    if (!match_id || !player_id) {
+      return res.status(400).json({ error: "Match ID and player ID are required" });
+    }
+
+    const {club_id} = await getPlayerById(player_id);
+    const {goals_scored, assists} = await getPlayerPerformanceById(player_id);
+    const goals_scored_diff = performanceData.goals_scored - goals_scored;
+
+    const MatchPerformanceQuery = `
+      UPDATE match_player_performance
+      SET goals_scored = ?, assists = ?
+      WHERE match_id = ? AND player_id = ?;
+    `;
+    const [result] = await pool.promise().query(MatchPerformanceQuery, [performanceData.goals_scored,performanceData.assists, match_id, player_id]);
+
+    const MatchStatsQuery = `
+      UPDATE match_team_stats
+      SET total_goals = total_goals + ?
+      WHERE match_id = ? AND club_id = ?;
+    `;
+    await pool.promise().query(MatchStatsQuery, [goals_scored_diff, match_id, club_id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "Player performance not found" });
+    }
+
+    res.json({ message: "Player performance updated successfully" })
+
+    
+  } catch (error) {
+    console.error("Error updating player performance:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+
+
+
+
+//get club players
+
+router.get('/club/players/:club_id', isAuth, isAutho([1, 2, 3]), async (req, res) => {
+  try {
+    const clubId = parseInt(req.params.club_id);
+
+    if (isNaN(clubId)) {
+      return res.status(400).json({ error: "Invalid club ID" });
+    }
+
+    const query = `
+      SELECT 
+        p.player_name,
+        p.player_id,
+        c.club_name
+      FROM 
+        player p
+      LEFT JOIN 
+        club c ON p.club_id = c.club_id
+      WHERE 
+        p.club_id = ?;
+    `;
+
+    const [rows] = await pool.promise().query(query, [clubId]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "No players found for this club" });
+    }
+
+    res.json({ players: rows });
+  } catch (error) {
+    console.error("Error fetching club players:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+})
+
+// post performance player
+router.post('/match/player-performance', isAuth, isAutho([1, 2]), async (req, res) => {
+  try {
+    const {match_id, player_id} = req.body;
+    const query = `
+      INSERT INTO match_player_performance (match_id, player_id)
+      VALUES (?, ?)
+    `;
+    await pool.promise().query(query, [match_id, player_id]); 
+    res.status(201).json({ message: "Player performance added successfully" });         
+  }
+  catch (error) {
+    console.error("Error adding player performance:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+})
+
 async function getUserByEmail(email) {
   const [result] = await pool.promise().query('SELECT * FROM admin_account WHERE email = ?', [email]);
   return result[0];
@@ -692,6 +982,16 @@ async function getUserByEmail(email) {
 
 async function getUserById(id) {
   const [result] = await pool.promise().query('SELECT * FROM admin_account WHERE admin_id = ?', [id]);
+  return result[0];
+}
+
+async function getPlayerById(id){
+  const [result] = await pool.promise().query('SELECT * FROM player WHERE player_id = ?', [id]);
+  return result[0];
+}
+
+async function getPlayerPerformanceById(id) {
+  const [result] = await pool.promise().query('SELECT * FROM match_player_performance WHERE player_id = ?', [id]);
   return result[0];
 }
 
