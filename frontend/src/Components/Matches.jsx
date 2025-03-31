@@ -168,8 +168,8 @@ const handleCancel = () => {
         <select name="club1" value={newMatch.club1} onChange={handleInputChange} className="w-full p-2 border rounded" required>
           <option value="">Select a team</option>
           {teams.map((team) => (
-            <option key={team.club_id} value={team.club_id}>
-              {team.club_name}
+            <option key={club.club_id} value={club.club_id}>
+              {club.club_name}
             </option>
           ))}
         </select>
@@ -181,8 +181,8 @@ const handleCancel = () => {
         <select name="club2" value={newMatch.club2} onChange={handleInputChange} className="w-full p-2 border rounded" required>
           <option value="">Select a team</option>
           {teams.map((team) => (
-            <option key={team.club_id} value={team.club_id}>
-              {team.club_name}
+            <option key={club.club_id} value={club.club_id}>
+              {club.club_name}
             </option>
           ))}
         </select>
