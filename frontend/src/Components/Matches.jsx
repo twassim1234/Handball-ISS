@@ -113,18 +113,42 @@ const handleCancel = () => {
     }
   }
 
+  const [club, setClub] = useState([]);
+
+  const fetchClubs = useCallback(async () => {
+    try {
+      const response = await axios.get("http://localhost:8000/club");
+      if (response.data && Array.isArray(response.data.club)) {
+        setClub(response.data.club);
+      } else {
+        console.error("Unexpected response format:", response.data);
+      }
+    } catch (error) {
+      console.error("Error fetching clubs:", error.message);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!user) return;
+    fetchClubs();
+  }, [user, fetchClubs]);
+
+  useEffect(() => {
+    fetchClubs();
+  }, []);
+
   return (
     <AuthenticationLayout>
      <div className="p-6 md:p-8 lg:p-22">
         {/* Filter Buttons */}
         <div className="flex gap-2 mb-6">
-          {["all", "new", "old"].map((status) => (
+          {["all", "Scheduled", "Ongoing", "Finished"].map((status) => (
             <button
               key={status}
               onClick={() => setFilter(status)}
               className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-800 transition"
             >
-              {status === "all" ? "All Matches" : status === "new" ? "New Matches" : "Old Matches"}
+              {status === "all" ? "All Matches" : status}
             </button>
           ))}
         </div>
@@ -167,11 +191,11 @@ const handleCancel = () => {
         <label className="block mb-2">Team 1</label>
         <select name="club1" value={newMatch.club1} onChange={handleInputChange} className="w-full p-2 border rounded" required>
           <option value="">Select a team</option>
-          {teams.map((team) => (
-            <option key={club.club_id} value={club.club_id}>
+          {club.map((club) => (
+              <option key={club.club_id} value={club.club_name}>
               {club.club_name}
-            </option>
-          ))}
+              </option>
+            ))}
         </select>
       
       </div>
@@ -180,11 +204,11 @@ const handleCancel = () => {
         <label className="block mb-2">Team 2</label>
         <select name="club2" value={newMatch.club2} onChange={handleInputChange} className="w-full p-2 border rounded" required>
           <option value="">Select a team</option>
-          {teams.map((team) => (
-            <option key={club.club_id} value={club.club_id}>
+          {club.map((club) => (
+              <option key={club.club_id} value={club.club_name}>
               {club.club_name}
-            </option>
-          ))}
+              </option>
+            ))}
         </select>
       </div>
 
@@ -217,13 +241,13 @@ const handleCancel = () => {
             <div className="mb-4">
               <label className="block mb-2">Status</label>
               <select name="status" value={newMatch.status} onChange={handleInputChange} className="w-full p-2 border rounded">
-                <option value="new">Scheduled</option>
-                <option value="new">Ongoing </option>
-                <option value="old">Finished</option>
+                <option value="Scheduled">Scheduled</option>
+                <option value="Ongoing">Ongoing </option>
+                <option value="Finished">Finished</option>
               </select>
             </div>
             <div className="flex justify-between">
-              <button type="button" onClick={handleCancel} className="px-6 py-3 bg-red-500 text-white rounded hover:bg-red-600 transition">Cancel</button>
+              <button type="button" onClick={handleCancel} className="px-6 py-3 bg-red-500 text-white rounded hover:bg-red-6</div>00 transition">Cancel</button>
               <button type="submit" className="px-6 py-3 bg-blue-500 text-white rounded hover:bg-blue-600 transition">Add Match</button>
             </div>
           </form>
