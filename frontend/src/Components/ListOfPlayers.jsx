@@ -103,14 +103,14 @@ const ListOfPlayers = ({club1_name, club2_name, club1_id, club2_id, match_id}) =
               </tr>
 
               <tr className="bg-gray-200">
-                <th className="border p-2">N lit</th>
-                <th className="border p-2">N </th>
+                <th className="border p-2">N° Lic</th>
+                <th className="border p-2">N° </th>
                 <th className="border p-2">Equipe A</th>
                 <th className="border p-2">BUT</th>
                 <th className="border p-2">A</th>
-                <th className="border p-2">2</th>
-                <th className="border p-2">CH</th>
-                <th className="border p-2">CH</th>
+                <th className="border p-2">CR</th>
+                <th className="border p-2">CB</th>
+                <th className="border p-2">2'</th>
                 <th className="border p-2">Actions</th>
               </tr>
             </thead>
@@ -166,18 +166,42 @@ const ListOfPlayers = ({club1_name, club2_name, club1_id, club2_id, match_id}) =
                     <td className="border p-2 text-center">
                       <input
                         type="number"
+                        value={player.yellow_cards}
+                        onChange={({ target: { value } }) =>
+                          onPlayerPerformanceChange(
+                            player.player_id,
+                            "yellow_cards",
+                            parseInt(value)
+                          )
+                        }
                         className="w-16 p-1 border rounded"
                       />
                     </td>
                     <td className="border p-2 text-center">
                       <input
                         type="number"
+                        value={player.red_cards}
+                        onChange={({ target: { value } }) =>
+                          onPlayerPerformanceChange(
+                            player.player_id,
+                            "red_cards",
+                            parseInt(value)
+                          )
+                        }
                         className="w-16 p-1 border rounded"
                       />
                     </td>
                     <td className="border p-2 text-center">
                       <input
                         type="number"
+                        value={player.two_minute_suspensions}
+                        onChange={({ target: { value } }) =>
+                          onPlayerPerformanceChange(
+                            player.player_id,
+                            "two_minute_suspensions",
+                            parseInt(value)
+                          )
+                        }
                         className="w-16 p-1 border rounded"
                       />
                     </td>
@@ -222,63 +246,163 @@ const ListOfPlayers = ({club1_name, club2_name, club1_id, club2_id, match_id}) =
             <p>VS</p> {/* This is the sign between the teams */}
           </div>
         </div>
-
         {/* Team B Table */}
-        <table className="w-1/2 border-collapse border">
-          <thead>
-            <tr>
-              <th
-                colSpan="8"
-                className="bg-blue-600 text-white text-center py-2"
-              >
-                {club2_name}
-              </th>
-            </tr>
-            <tr className="bg-gray-200">
-              <th className="border p-2">N lit</th>
-              <th className="border p-2">N </th>
-              <th className="border p-2">Equipe B</th>
-              <th className="border p-2">BUT</th>
-              <th className="border p-2">A</th>
-              <th className="border p-2">2</th>
-              <th className="border p-2">CH</th>
-              <th className="border p-2">CH</th>
-            </tr>
-          </thead>
-          <tbody>
-            {[...Array(15)].map((_, index) => (
-              <tr key={index}>
-                <td className="border p-2 text-center">{index + 1}</td>
-                <td className="border p-2 text-center">
-                  <input type="text" className="w-16 p-1 border rounded" />
-                </td>
-                <td className="border p-2 text-center">
-                  <input type="text" className="w-44 p-1 border rounded" />
-                </td>
-                <td className="border p-2 text-center">
-                  <input type="number" className="w-16 p-1 border rounded" />
-                </td>
-                <td className="border p-2 text-center">
-                  <input type="number" className="w-16 p-1 border rounded" />
-                </td>
-                <td className="border p-2 text-center">
-                  <input type="number" className="w-16 p-1 border rounded" />
-                </td>
-                <td className="border p-2 text-center">
-                  <input type="number" className="w-16 p-1 border rounded" />
-                </td>
-                <td className="border p-2 text-center">
-                  <input type="number" className="w-16 p-1 border rounded" />
-                </td>
+        <div className="flex flex-col justify-start items-start">
+          <table className="w-1/2 border-collapse border">
+            <thead>
+              <tr>
+                <th
+                  colSpan="9"
+                  className="bg-blue-600 text-white text-center py-2"
+                >
+                  {club2_name}
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+
+              <tr className="bg-gray-200">
+                <th className="border p-2">N° Lic</th>
+                <th className="border p-2">N° </th>
+                <th className="border p-2">Equipe A</th>
+                <th className="border p-2">BUT</th>
+                <th className="border p-2">A</th>
+                <th className="border p-2">CR</th>
+                <th className="border p-2">CB</th>
+                <th className="border p-2">2'</th>
+                <th className="border p-2">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {match_players
+                .filter((player) =>
+                  club2_players.find((p) => p.player_id === player.player_id)
+                )
+                .map((player, index) => (
+                  <tr key={index}>
+                    <td className="border p-2 text-center">{index + 1}</td>
+                    <td className="border p-2 text-center">
+                      <input type="text" className="w-16 p-1 border rounded" />
+                    </td>
+                    <td className="border p-2 text-center">
+                      <input
+                        type="text"
+                        disabled
+                        value={
+                          getPlayer(club2_players, player.player_id).player_name
+                        }
+                        className="w-44 p-1 border rounded"
+                      />
+                    </td>
+                    <td className="border p-2 text-center">
+                      <input
+                        type="number"
+                        value={player.goals_scored}
+                        onChange={({ target: { value } }) =>
+                          onPlayerPerformanceChange(
+                            player.player_id,
+                            "goals_scored",
+                            parseInt(value)
+                          )
+                        }
+                        className="w-16 p-1 border rounded"
+                      />
+                    </td>
+                    <td className="border p-2 text-center">
+                      <input
+                        type="number"
+                        value={player.assists}
+                        onChange={({ target: { value } }) =>
+                          onPlayerPerformanceChange(
+                            player.player_id,
+                            "assists",
+                            parseInt(value)
+                          )
+                        }
+                        className="w-16 p-1 border rounded"
+                      />
+                    </td>
+                    <td className="border p-2 text-center">
+                      <input
+                        type="number"
+                        value={player.yellow_cards}
+                        onChange={({ target: { value } }) =>
+                          onPlayerPerformanceChange(
+                            player.player_id,
+                            "yellow_cards",
+                            parseInt(value)
+                          )
+                        }
+                        className="w-16 p-1 border rounded"
+                      />
+                    </td>
+                    <td className="border p-2 text-center">
+                      <input
+                        type="number"
+                        value={player.red_cards}
+                        onChange={({ target: { value } }) =>
+                          onPlayerPerformanceChange(
+                            player.player_id,
+                            "red_cards",
+                            parseInt(value)
+                          )
+                        }
+                        className="w-16 p-1 border rounded"
+                      />
+                    </td>
+                    <td className="border p-2 text-center">
+                      <input
+                        type="number"
+                        value={player.two_minute_suspensions}
+                        onChange={({ target: { value } }) =>
+                          onPlayerPerformanceChange(
+                            player.player_id,
+                            "two_minute_suspensions",
+                            parseInt(value)
+                          )
+                        }
+                        className="w-16 p-1 border rounded"
+                      />
+                    </td>
+                    <td className="p-2 flex flex-row justify-center gap-x-4 items-center">
+                      <button
+                        className="cursor-pointer"
+                        title="save changes"
+                        onClick={() => handlePlayerPerformanceSave(player.player_id)}
+                      >
+                        💾
+                      </button>
+                      <button className="cursor-pointer" title="delete" onClick={() => handleDeletePlayer(player.player_id)}>
+                        ✘
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+          <div className="flex justify-center items-center">
+            <select
+              className="w-96 p-1 border rounded"
+              onChange={(e) => setClub2SelectedPlayer(e.target.value)}
+            >
+              <option value="">Select Player</option>
+              {club1_players.filter(player=>!match_players.find(p=>p.player_id===player.player_id)).map((player) => (
+                <option value={player.player_id}>{player.player_name}</option>
+              ))}
+            </select>
+            <button
+              className="bg-blue-600 text-white p-2 rounded cursor-pointer"
+              onClick={() => handlePlayerAdd(club2_selected_player)}
+            >
+              Add Player
+            </button>
+          </div>
+        </div>
+
+      
       </div>
 
       {/* Additional tables for other players or sections */}
       <div className="flex space-x-4">
-        <table className="w-1/2 border-collapse border">
+        {/*<table className="w-1/2 border-collapse border">
           <tbody>
             {[...Array(5)].map((_, index) => (
               <tr key={index}>
@@ -308,14 +432,14 @@ const ListOfPlayers = ({club1_name, club2_name, club1_id, club2_id, match_id}) =
               singuature
             </th>
           </tr>
-        </table>
+        </table> */}
 
         {/* Sign Section between Teams */}
         <div className="flex flex-col justify-center  w-1/2">
           <div className="text-center text-lg p-4"></div>
         </div>
 
-        <table className="w-1/2 border-collapse">
+        {/*<table className="w-1/2 border-collapse">
           <tbody>
             {[...Array(5)].map((_, index) => (
               <tr key={index}>
@@ -345,7 +469,7 @@ const ListOfPlayers = ({club1_name, club2_name, club1_id, club2_id, match_id}) =
               singuature
             </th>
           </tr>
-        </table>
+        </table>*/}
       </div>
     </div>
   );
