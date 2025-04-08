@@ -511,7 +511,7 @@ router.get('/qualification-requests/retrieve',isAuth,isAutho([1]), async (req, r
       SELECT qr.request_id, qr.fullname, qr.email, qr.phone_number, 
              qr.extrait_de_naissance, qr.autorisation_parentale, qr.cin_scolaire, 
              qr.photo, qr.extrait_de_payment, qr.status, qr.request_date, 
-             p.player_name, p.club_id, c.club_name
+             p.player_name, p.club_id, c.club_name,p.reference
       FROM qualification_request qr
       LEFT JOIN player p ON qr.player_id = p.player_id
       LEFT JOIN club c ON p.club_id = c.club_id

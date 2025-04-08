@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import Search from "./Sections/Search";
 
-const Requests = () => {
+const Requests = ({ filter }) => {
   const [requests, setRequests] = useState([]);
+  const [filteredRequests, setFilteredRequests] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Fetch qualification requests from the backend
   useEffect(() => {
@@ -26,6 +29,7 @@ const Requests = () => {
           fullName: request.fullname,
           email: request.email,
           phoneNumber: request.phone_number,
+          reference: request.reference, 
           files: [
             { name: "Extrait de naissance", url: `http://localhost:8000/${request.extrait_de_naissance}` },
             { name: "Autorisation parentale", url: `http://localhost:8000/${request.autorisation_parentale}` },
@@ -38,13 +42,43 @@ const Requests = () => {
         }));
 
         setRequests(mappedRequests);
+        applyFilter(mappedRequests, filter,searchTerm);
       } catch (error) {
         console.error("Error fetching qualification requests:", error);
       }
     };
 
     fetchRequests();
-  }, []);
+  }, [filter]);
+
+  // Apply filter when filter prop changes
+  useEffect(() => {
+    applyFilter(requests, filter,searchTerm);
+  }, [filter,searchTerm, requests]);
+
+  const applyFilter = (requestsToFilter, currentFilter, searchTerm) => {
+    let filtered = requestsToFilter;
+    
+    // Apply status filter
+    if (currentFilter !== "all") {
+      filtered = filtered.filter((request) => 
+        request.status.toLowerCase() === currentFilter
+      );
+    }
+    
+    // Apply search filter if search term exists
+    if (searchTerm) {
+      filtered = filtered.filter((request) =>
+        request.reference?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    
+    setFilteredRequests(filtered);
+  };
+
+  const handleSearch = (term) => {
+    setSearchTerm(term);
+  };
 
   // Handle Approve action
   const handleApprove = async (id) => {
@@ -104,9 +138,14 @@ const Requests = () => {
 
   return (
     <div className="p-6 bg-gray-100 min-h-96">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">Qualification Requests</h1>
+      
+      <Search 
+  onSearch={handleSearch}
+  placeholder="Search by player's reference"  
+/>
       <div className="grid gap-6">
-        {requests.map((request) => (
+
+        {filteredRequests.map((request) => (
           <div
             key={request.id}
             className="p-4 bg-white rounded-lg shadow-lg border border-gray-200"
@@ -132,7 +171,7 @@ const Requests = () => {
             </p>
             <p className="mt-2 text-gray-700">Email: {request.email}</p>
             <p className="mt-1 text-gray-700">Phone: {request.phoneNumber}</p>
-
+            <p className="mt-1 text-gray-700">Ref: {request.reference}</p>
             <h3 className="mt-4 font-bold">Uploaded Files:</h3>
             <ul className="list-disc pl-6 mt-2 text-gray-600">
               {request.files.map((file, index) => (
@@ -150,18 +189,22 @@ const Requests = () => {
             </ul>
 
             <div className="mt-4 flex gap-2">
-              <button
-                onClick={() => handleApprove(request.id)}
-                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-              >
-                Accept
-              </button>
-              <button
-                onClick={() => handleReject(request.id)}
-                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-              >
-                Reject
-              </button>
+            {request.status === "Pending" && (
+                <>
+                  <button
+                    onClick={() => handleApprove(request.id)}
+                    className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                  >
+                    Accept
+                  </button>
+                  <button
+                    onClick={() => handleReject(request.id)}
+                    className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                  >
+                    Reject
+                  </button>
+                  </>
+              )}
             </div>
           </div>
         ))}

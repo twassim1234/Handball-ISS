@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 
-const Search = ({ onSearch }) => {
+const Search = ({ onSearch, placeholder = "Search ..." }) => {  // Added placeholder prop
   const [search, setSearch] = useState("");
 
   return (
     <div className="text-center py-4 bg-gray-50">
       <input
         type="text"
-        placeholder="Search ..."
+        placeholder={placeholder}  // Use the prop
         className="px-4 py-2 border rounded-md w-1/2"
         value={search}
         onChange={(e) => {
@@ -19,4 +19,4 @@ const Search = ({ onSearch }) => {
   );
 };
 
-export default Search ;
+export default Search;
