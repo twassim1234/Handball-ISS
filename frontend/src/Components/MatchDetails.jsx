@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { FiDownload } from "react-icons/fi";
 
 const MatchSheet = () => {
   const [matchDetails, setMatchDetails] = useState({
@@ -24,9 +25,20 @@ const MatchSheet = () => {
     setMatchDetails({ ...matchDetails, [e.target.name]: e.target.value });
   };
 
+  const handlePrint = () => {
+    window.print();
+  };
+
   return (
     <div className="p-4">
       <h2 className="text-2xl font-bold text-center mb-4">FEUILLE DE MATCH</h2>
+      <button 
+        onClick={handlePrint}
+        className="flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+      >
+       <FiDownload className="text-lg mr-2" />
+       <span>Export </span>
+      </button>
       <div className="overflow-x-auto">
         <table className="w-full border border-collapse border-gray-800">
           <thead>
@@ -68,7 +80,9 @@ const MatchSheet = () => {
            
           </tbody>
         </table>
+        
       </div>
+      
     </div>
   );
 };
