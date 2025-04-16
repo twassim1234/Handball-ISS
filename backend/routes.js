@@ -884,23 +884,31 @@ router.delete('/match/player-performance/:match_id/:player_id', isAuth, isAutho(
 
 router.put('/match/performance', isAuth, isAutho([1, 2, 3]), async (req, res) => {
   try {
-    const {match_id, player_id, ...performanceData} = req.body;
+    const { match_id, player_id, ...performanceData } = req.body;
 
     if (!match_id || !player_id) {
       return res.status(400).json({ error: "Match ID and player ID are required" });
     }
 
-    const {club_id} = await getPlayerById(player_id);
-    const {goals_scored, assists} = await getPlayerPerformanceById(player_id);
+    const { club_id } = await getPlayerById(player_id);
+    const { goals_scored, assists, red_cards, yellow_cards, two_minute_suspensions } = await getPlayerPerformanceById(player_id);
+
     const goals_scored_diff = performanceData.goals_scored - goals_scored;
 
     const MatchPerformanceQuery = `
       UPDATE match_player_performance
-      SET goals_scored = ?, assists = ?
+      SET goals_scored = ?, assists = ?, red_cards = ?, yellow_cards = ?, two_minute_suspensions = ?
       WHERE match_id = ? AND player_id = ?;
     `;
-    const [result] = await pool.promise().query(MatchPerformanceQuery, [performanceData.goals_scored,performanceData.assists, match_id, player_id]);
-
+    const [result] = await pool.promise().query(MatchPerformanceQuery, [
+      performanceData.goals_scored,
+      performanceData.assists,
+      performanceData.red_cards,
+      performanceData.yellow_cards,
+      performanceData.two_minute_suspensions,
+      match_id,
+      player_id,
+    ]);
     const MatchStatsQuery = `
       UPDATE match_team_stats
       SET total_goals = total_goals + ?
