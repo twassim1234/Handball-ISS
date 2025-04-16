@@ -121,7 +121,7 @@ const ListOfPlayers = ({club1_name, club2_name, club1_id, club2_id, match_id}) =
                 )
                 .map((player, index) => (
                   <tr key={index}>
-                    <td className="border p-2 text-center">{index + 1}</td>
+                    <td className="border p-2 text-center">{getPlayer(club1_players, player.player_id).reference}</td>
                     <td className="border p-2 text-center">
                       <input type="text" className="w-16 p-1 border rounded" />
                     </td>
@@ -278,7 +278,7 @@ const ListOfPlayers = ({club1_name, club2_name, club1_id, club2_id, match_id}) =
                 )
                 .map((player, index) => (
                   <tr key={index}>
-                    <td className="border p-2 text-center">{index + 1}</td>
+                    <td className="border p-2 text-center">{getPlayer(club2_players, player.player_id).reference}</td>
                     <td className="border p-2 text-center">
                       <input type="text" className="w-16 p-1 border rounded" />
                     </td>
