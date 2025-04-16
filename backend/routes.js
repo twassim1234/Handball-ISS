@@ -4,6 +4,9 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const isAuth = require('./isAuth');
 const isAutho = require('./isAutho');
+const fs = require('fs');
+const pdfParse = require('pdf-parse');
+const { queryChatbot, streamChatbot, streamGeminiResponse } = require('./AIController'); // Import AIController functions
 
 const multer = require("multer");
 const path = require("path");
@@ -995,6 +998,46 @@ async function getPlayerPerformanceById(id) {
   return result[0];
 }
 
+// Route to handle standard chat queries
+router.post('/chat', queryChatbot);
+
+// Route to handle streaming chat responses
+router.post('/chat/stream', streamChatbot);
+
+
+const uploads = multer({ dest: 'uploads/' });
+
+router.post('/extract-pdf', uploads.single('file'), async (req, res) => {
+  try {
+    const file = req.file;
+    if (!file) return res.status(400).json({ error: 'No file uploaded' });
+
+    const dataBuffer = fs.readFileSync(file.path);
+    const pdfData = await pdfParse(dataBuffer);
+    const extractedText = pdfData.text;
+
+    const geminiPrompt = `Here's a PDF content:\n\n${extractedText}\n\nGive me a summary of this document.`;
+
+    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+    const result = await model.generateContentStream(geminiPrompt);
+
+    res.writeHead(200, { "Content-Type": "text/plain" });
+
+    for await (const chunk of result.stream) {
+      res.write(chunk.text());
+    }
+
+    res.end();
+
+    // Optional: cleanup the uploaded file
+    fs.unlink(file.path, (err) => {
+      if (err) console.error("Failed to delete uploaded file:", err);
+    });
+  } catch (err) {
+    console.error('Error processing PDF:', err);
+    res.status(500).json({ error: 'Failed to process PDF with Gemini' });
+  }
+});
 
 
 module.exports = router;
