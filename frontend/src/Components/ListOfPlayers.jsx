@@ -262,7 +262,7 @@ const ListOfPlayers = ({club1_name, club2_name, club1_id, club2_id, match_id}) =
               <tr className="bg-gray-200">
                 <th className="border p-2">N° Lic</th>
                 <th className="border p-2">N° </th>
-                <th className="border p-2">Equipe A</th>
+                <th className="border p-2">Equipe B</th>
                 <th className="border p-2">BUT</th>
                 <th className="border p-2">A</th>
                 <th className="border p-2">CR</th>
@@ -384,7 +384,7 @@ const ListOfPlayers = ({club1_name, club2_name, club1_id, club2_id, match_id}) =
               onChange={(e) => setClub2SelectedPlayer(e.target.value)}
             >
               <option value="">Select Player</option>
-              {club1_players.filter(player=>!match_players.find(p=>p.player_id===player.player_id)).map((player) => (
+              {club2_players.filter(player=>!match_players.find(p=>p.player_id===player.player_id)).map((player) => (
                 <option value={player.player_id}>{player.player_name}</option>
               ))}
             </select>
