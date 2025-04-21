@@ -6,6 +6,54 @@ const Requests = ({ filter }) => {
   const [requests, setRequests] = useState([]);
   const [filteredRequests, setFilteredRequests] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [aiResponses, setAiResponses] = useState({});
+  const [loadingAiId, setLoadingAiId] = useState(null);
+
+
+  const handleUseAI = async (id, files) => {
+    const paymentFile = files.find((f) => f.name === "Extrait de paiement");
+    if (!paymentFile?.url) {
+      alert("Payment receipt not found.");
+      return;
+    }
+  
+    setLoadingAiId(id);
+  
+    try {
+      // Upload PDF to backend
+      const response = await fetch(paymentFile.url);
+      const blob = await response.blob();
+      const file = new File([blob], "payment.pdf", { type: "application/pdf" });
+  
+      const formData = new FormData();
+      formData.append("file", file);
+  
+      // Get the plain-text summary from backend
+      const { data } = await axios.post(
+        "http://localhost:8000/extract-pdf",
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+  
+      // Display the AI summary directly
+      setAiResponses((prev) => ({
+        ...prev,
+        [id]: (
+          <div style={{ whiteSpace: 'pre-line' }}>  {/* This makes \n work */}
+            {data}
+          </div>
+        ),
+      }));
+    } catch (err) {
+      setAiResponses((prev) => ({
+        ...prev,
+        [id]: "❌ Failed to validate payment. Try again.",
+      }));
+    } finally {
+      setLoadingAiId(null);
+    }
+  };
+  
 
   // Fetch qualification requests from the backend
   useEffect(() => {
@@ -206,6 +254,24 @@ const Requests = ({ filter }) => {
                   </>
               )}
             </div>
+            <div className="flex justify-end">
+            <button
+              onClick={() => handleUseAI(request.id, request.files)}
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            >
+              Use AI
+            </button>
+          </div>
+          {loadingAiId === request.id && (
+              <p className="text-blue-500 mt-2">Analyzing with AI...</p>
+            )}
+
+            {aiResponses[request.id] && (
+              <div className="mt-3 p-3 bg-gray-100 border-l-4 border-blue-500 text-gray-800">
+                <strong>AI Summary:</strong>
+                <p>{aiResponses[request.id]}</p>
+              </div>
+            )}
           </div>
         ))}
       </div>
