@@ -4,7 +4,7 @@ import Login from "./Components/Login";
 import Register from "./Components/Register";
 import Home from "./Components/Pages/Home";
 import Contact from "./Components/Pages/Contact";
-import About from "./Components/Pages/About";
+import About from "./Components/About";
 import Navbar from "./Components/Navbar";
 import Player from "./Components/Player";
 import Teams from "./Components/Teams";
