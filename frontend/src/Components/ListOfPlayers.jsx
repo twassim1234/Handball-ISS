@@ -91,7 +91,7 @@ const ListOfPlayers = ({club1_name, club2_name, club1_id, club2_id, match_id}) =
       <div className="flex space-x-4 mt-12">
         {/* Team A Table */}
         <div className="flex flex-col justify-start items-start">
-          <table className="w-1/2 border-collapse border">
+          <table className="w-2/5 border-collapse border">
             <thead>
               <tr>
                 <th
@@ -241,14 +241,14 @@ const ListOfPlayers = ({club1_name, club2_name, club1_id, club2_id, match_id}) =
         </div>
 
         {/* Sign Section between Teams */}
-        <div className="flex flex-col justify-center items-center w-1/2">
+        <div className="flex flex-col justify-center items-center w-1/5">
           <div className="text-center font-bold text-xl p-4">
             <p>VS</p> {/* This is the sign between the teams */}
           </div>
         </div>
         {/* Team B Table */}
         <div className="flex flex-col justify-start items-start">
-          <table className="w-1/2 border-collapse border">
+          <table className="w-2/5 border-collapse border">
             <thead>
               <tr>
                 <th
