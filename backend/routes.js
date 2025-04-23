@@ -4,10 +4,15 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const isAuth = require('./isAuth');
 const isAutho = require('./isAutho');
+const fs = require('fs');
+const pdfParse = require('pdf-parse');
+const { queryChatbot, streamChatbot, streamGeminiResponse } = require('./AIController'); // Import AIController functions
 
 const multer = require("multer");
 const path = require("path");
 const { match } = require('assert');
+// Add this to your imports
+const { genAI } = require('./AIController');
 
 // Set up storage
 const storage = multer.diskStorage({
@@ -1004,6 +1009,62 @@ async function getPlayerPerformanceById(id) {
   return result[0];
 }
 
+// Route to handle standard chat queries
+router.post('/chat', queryChatbot);
+
+// Route to handle streaming chat responses
+router.post('/chat/stream', streamChatbot);
+
+
+const uploads = multer({ dest: 'uploads/' });
+
+router.post('/extract-pdf', uploads.single('file'), async (req, res) => {
+  try {
+    const file = req.file;
+    if (!file) return res.status(400).json({ error: 'No PDF uploaded' });
+
+    // 1. Extract text from PDF
+    const dataBuffer = fs.readFileSync(file.path);
+    const pdfData = await pdfParse(dataBuffer);
+    const extractedText = pdfData.text;
+
+    if (!extractedText) {
+      return res.status(400).json({ error: "No text found in PDF" });
+    }
+
+    // 2. Ask AI for a human-readable summary (like your example)
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
+    const prompt = `
+      Analyze this payment receipt and provide a **detailed summary** in this format:
+
+      ---
+      
+      [Concise summary of payment purpose, method, amount, and date. Example:  
+      "This is a payment received from [Organization] confirming [Name]'s payment of [Amount] on [Date] at [Time] via [Method] for [Purpose], The receipt ID is [Receipt ID]."]\n
+
+      **Payment Validity:** ✅ VALID / ❌ INVALID (Must be ≥ 50.00 DT) \n 
+      **Amount Paid:** [XX.XX DT] \n 
+      **Date:** [YYYY-MM-DD] \n 
+      ---
+
+      Receipt text:  
+      ${extractedText}
+    `;
+
+    const result = await model.generateContent(prompt);
+    const aiResponse = await result.response;
+    const summary = aiResponse.text(); // Get the plain-text response
+
+    // 3. Send the raw text (no JSON)
+    res.status(200).send(summary);
+
+    // Cleanup
+    fs.unlink(file.path, () => {});
+  } catch (err) {
+    console.error('Error:', err);
+    res.status(500).send("❌ Failed to process payment receipt.");
+  }
+});
 
 
 module.exports = router;
