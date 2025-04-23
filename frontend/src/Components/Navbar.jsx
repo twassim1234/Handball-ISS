@@ -1,75 +1,114 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from "react";
 import Logo from "../Assets/logonav.jpg";
-import menu from "../Assets/menu.png";
-import close from "../Assets/close-icon.svg";
 import { Link } from "react-router-dom";
+import { FaRegWindowClose, FaBars } from "react-icons/fa";
+import Login from "./Login";
+import { useContext } from "react";
+import { UserContext } from "../Contexts/UserContext";
 
 const Navbar = () => {
-  const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const { user, setUser } = useContext(UserContext);
+  const [click, setClick] = useState(false);
+  const handleClick = () => setClick(!click);
 
-  useEffect(() => {
-    if (showMobileMenu) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'auto';
+  const handleLogout = () => {
+    if(user){
+      localStorage.removeItem("token");
+      setUser(undefined);
     }
-    return () => {
-      document.body.style.overflow = 'auto';
-    };
-  }, [showMobileMenu]);
+  }
+
+  const content = (
+    <div
+      className="lg:hidden block absolute top-16 w-full left-0 right-0 
+      bg-red-500 transition"
+    >
+      <ul className="text-center text-xl p-4">
+        <li className="my-4 py-4 border-b border-slate-800 hover:bg-slate-800 hover:rounded">
+          <a href="/">Home</a>
+        </li>
+        <li className="my-4 py-4 border-b border-slate-800 hover:bg-slate-800 hover:rounded">
+          <a href="/teams">Teams</a>
+        </li>
+    
+        <li className="my-4 py-4 border-b border-slate-800 hover:bg-slate-800 hover:rounded">
+          <a href="/dashboard">Dashboard</a>
+        </li>
+        <li className="my-4 py-4 border-b border-slate-800 hover:bg-slate-800 hover:rounded">
+          <a href="/matches">Matches</a>
+        </li>
+        <li className="my-4 py-4 border-b border-slate-800 hover:bg-slate-800 hover:rounded">
+          <a href="/about">About</a>
+        </li>
+        <li className="my-4 py-4 border-b border-slate-800 hover:bg-slate-800 hover:rounded">
+          <a href="/contact">Contact us</a>
+        </li>
+        <li className="my-4 py-4 border-b border-slate-800 hover:bg-slate-800 hover:rounded">
+          <a href="/login">Login</a>
+        </li>
+      </ul>
+    </div>
+  );
 
   return (
-    <>
-      <nav className='fixed top-0 left-0 w-full z-50 bg-white shadow-md'>
-        <div className='container mx-auto flex justify-between items-center py-4 px-6'>
-          <img src={Logo} alt="Logo" className='h-16 w-80 object-contain' />
+    <nav className="relative">
+      <div
+        className="h-22 flex justify-between z-50 text-red-500 lg:py-5 
+      lg:px-36 md:px-16 px-8 py-8"
+      >
+        <div className="flex items-center flex-1">
+          <span>
+            <Link to="/">
+            <img src={Logo} alt="Logo" className="w-96" /></Link>
+          </span>
+        </div>
 
-          {/* Desktop Menu */}
-          <ul className='hidden lg:flex gap-9 text-red-500 text-lg font-medium'>
-            <a href="/" className='hover:text-red-700'>Home</a>
-            <a href="/teams" className='hover:text-red-700'>Teams</a>
-            <a href="/dashboard" className='hover:text-red-700'>Dashboard</a>
-            <a href="/matches" className='hover:text-red-700'>Matches</a>
-            <a href="/about" className='hover:text-red-700'>About</a>
-            <a href="/contact" className='hover:text-red-700'>Contact</a>
-          </ul>
+        <div className="lg:flex hidden lg:flex-1 items-center justify-center font-normal">
+  <ul className="flex gap-12 text-[18px]">
+    <li className="hover:text-red-800 cursor-pointer">
+      <a href="/">Home</a>
+    </li>
+    <li className="hover:text-red-800 cursor-pointer">
+      <a href="/teams">Teams</a>
+    </li>
 
-          <button className='hidden lg:block bg-black px-8 py-2 rounded-full font-bold text-white'>
-            <a href="/login">Login</a>
+    <li className="hover:text-red-800  cursor-pointer">
+      <a href="/dashboard">Dashboard</a>
+    </li>
+    <li className="hover:text-red-800  cursor-pointer">
+      <a href="/matches">Matches</a>
+    </li>
+    <li className="hover:text-red-800   cursor-pointer">
+      <a href="/about">About</a>
+    </li>
+    <li className="hover:text-red-800 cursor-pointer">
+      <a href="/contact">Contact</a>
+    </li>
+  </ul>
+
+  {/* Login button aligned to the left */}
+  <div className="lg:ml-96 bg-red-500 text-white py-2 px-4 rounded-full cursor-pointer hover:bg-red-800 transition">
+      <a href={user?"/":"/login"} onClick={handleLogout}>{user?"Logout":"Login"}</a>
+    
+  </div>
+</div>
+
+        {/* Mobile Menu Button */}
+        <div className="lg:hidden  flex items-center">
+          <button className="transition" onClick={handleClick}>
+            {click ? <FaRegWindowClose size={24} /> : <FaBars size={24} />}
           </button>
-
-          {/* Mobile Menu Button (visible on sm & md) */}
-          <img
-            onClick={() => setShowMobileMenu(true)}
-            src={menu}
-            className="block lg:hidden w-7 cursor-pointer"
-            alt='menu'
-          />
         </div>
+      </div>
 
-        {/* Mobile Menu */}
-        <div className={`lg:hidden fixed top-0 right-0 bottom-0 ${showMobileMenu ? 'w-full' : 'w-0'} overflow-hidden bg-white transition-all duration-300`}>
-          <div className='flex justify-end p-6'>
-            <img onClick={() => setShowMobileMenu(false)} src={close} className='w-6 cursor-pointer' alt='close' />
-          </div>
-          <ul className='flex flex-col items-center gap-6 mt-5 text-lg font-medium text-red-500'>
-            <a onClick={() => setShowMobileMenu(false)} href="/" className='px-4 py-2'>Home</a>
-            <a onClick={() => setShowMobileMenu(false)} href="/about" className='px-4 py-2'>About</a>
-            <a onClick={() => setShowMobileMenu(false)} href="/projects" className='px-4 py-2'>Projects</a>
-            <a onClick={() => setShowMobileMenu(false)} href="/matches" className='px-4 py-2'>Matches</a>
-            <a onClick={() => setShowMobileMenu(false)} href="/dashboard" className='px-4 py-2'>Dashboard</a>
-            <a onClick={() => setShowMobileMenu(false)} href="/teams" className='px-4 py-2'>Teams</a>
-            <button className='bg-black px-8 py-2 rounded-full text-white mt-8 font-bold'>
-              <a href='/login'>Login</a>
-            </button>
-          </ul>
-        </div>
-      </nav>
-
-      {/* Spacer to prevent content from hiding behind fixed navbar */}
-      <div className="h-28"></div>
-    </>
+      {/* Mobile Menu */}
+      {click && content}
+    </nav>
   );
 };
 
 export default Navbar;
+
+/*
+
+*/

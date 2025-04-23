@@ -949,8 +949,7 @@ router.get('/club/players/:club_id', isAuth, isAutho([1, 2, 3]), async (req, res
       SELECT 
         p.player_name,
         p.player_id,
-        c.club_name,
-        p.reference
+        c.club_name
       FROM 
         player p
       LEFT JOIN 
