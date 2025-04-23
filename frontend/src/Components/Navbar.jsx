@@ -19,36 +19,41 @@ const Navbar = () => {
   }
 
   const content = (
-    <div
-      className="lg:hidden block absolute top-16 w-full left-0 right-0 
-      bg-red-500 transition"
-    >
-      <ul className="text-center text-xl p-4">
-        <li className="my-4 py-4 border-b border-slate-800 hover:bg-slate-800 hover:rounded">
+    <div className="lg:hidden block absolute top-0 left-0 w-full h-screen bg-white z-50 transition-all overflow-hidden">
+      <button
+        onClick={handleClick}
+        className="absolute top-5 right-5 text-red-500 hover:text-red-800 transition"
+      >
+        <FaRegWindowClose size={30} />
+      </button>
+  
+      <ul className="text-center text-xl p-4 pt-24">
+        <li className="my-4 py-4 border-b border-slate-800 hover:bg-red-800 hover:rounded">
           <a href="/">Home</a>
         </li>
-        <li className="my-4 py-4 border-b border-slate-800 hover:bg-slate-800 hover:rounded">
+        <li className="my-4 py-4 border-b border-slate-800 hover:bg-red-800 hover:rounded">
           <a href="/teams">Teams</a>
         </li>
-    
-        <li className="my-4 py-4 border-b border-slate-800 hover:bg-slate-800 hover:rounded">
+        <li className="my-4 py-4 border-b border-slate-800 hover:bg-red-800 hover:rounded">
           <a href="/dashboard">Dashboard</a>
         </li>
-        <li className="my-4 py-4 border-b border-slate-800 hover:bg-slate-800 hover:rounded">
+        <li className="my-4 py-4 border-b border-slate-800 hover:bg-red-800 hover:rounded">
           <a href="/matches">Matches</a>
         </li>
-        <li className="my-4 py-4 border-b border-slate-800 hover:bg-slate-800 hover:rounded">
+        <li className="my-4 py-4 border-b border-slate-800 hover:bg-red-800 hover:rounded">
           <a href="/about">About</a>
         </li>
-        <li className="my-4 py-4 border-b border-slate-800 hover:bg-slate-800 hover:rounded">
+        <li className="my-4 py-4 border-b border-slate-800 hover:bg-red-800 hover:rounded">
           <a href="/contact">Contact us</a>
         </li>
-        <li className="my-4 py-4 border-b border-slate-800 hover:bg-slate-800 hover:rounded">
+        <li className="my-4 py-4 border-b border-slate-800 hover:bg-red-800 hover:rounded">
           <a href="/login">Login</a>
         </li>
       </ul>
     </div>
   );
+  
+
 
   return (
     <nav className="relative">
@@ -108,7 +113,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-
-/*
-
-*/
