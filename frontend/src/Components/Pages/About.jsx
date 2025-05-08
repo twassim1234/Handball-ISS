@@ -14,15 +14,8 @@ const About = () => {
     mx-auto sm:p-4 lg:px-32  w-full overflow-hidden"
         id="About"
       >
-        <h1 className="text-2xl sm:text-4xl font-bold mb-2">
-          About
-          <span
-            className="underline underline-offset-4 decoration-1 under
-         font-light"
-          >
-            {" "}
-            US
-          </span>{" "}
+        <h1 className="text-2xl sm:text-4xl font-bold mb-2 underline">
+          About Us
         </h1>
 
         <p
