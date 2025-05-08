@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import pic1 from "../Assets/s1.jpg";
-import pic2 from "../Assets/s2.png";
-import pic3 from "../Assets/s3.png";
-import pic4 from "../Assets/s4.jpg";
-import pic5 from "../Assets/s5.jpeg";
-import pic6 from "../Assets/s6.png";
-import pic7 from "../Assets/s7.jpg";
-import pic8 from "../Assets/s8.jpg";
+import pic1 from "../Assets/Kempa.jpg";
+import pic2 from "../Assets/Tunisiar.png";
+import pic3 from "../Assets/Sabrine.jpeg";
+import pic4 from "../Assets/STB.png";
+import pic5 from "../Assets/Agil.png";
+import pic6 from "../Assets/Promo.jpeg";
 
-const partners = [pic1, pic2, pic3, pic4, pic5, pic6, pic7, pic8];
+const partners = [pic1, pic2, pic3, pic4, pic5, pic6];
 
 const PartnersSection = () => {
   const [index, setIndex] = useState(0);
@@ -48,7 +46,7 @@ const PartnersSection = () => {
               <img
                 src={image}
                 alt={`Partner ${i + 1}`}
-                className="h-20 object-contain"
+                className="h-30 w-60 object-contain"
               />
             </div>
           ))}
