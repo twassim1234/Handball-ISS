@@ -1,8 +1,6 @@
 import React from 'react';
-import pic1 from "../Assets/Players/player.jpg";
-import pic2 from "../Assets/Players/player.jpg";
-import pic3 from "../Assets/Players/player.jpg";
-// import star from "../Assets/star_icon.svg";
+import pic1 from "../Assets/user.png";
+
 import { motion } from "framer-motion";
 
 const Testimonials = () => {
@@ -11,23 +9,20 @@ const Testimonials = () => {
       name: "Ahmed Ben Youssef",
       title: "National Team Player",
       image: pic1,
-      alt: "Portrait of Ahmed Ben Youssef",
       rating: 5,
       text: "Representing Tunisia in handball has been a dream come true. The support from the federation and the fans motivates us to give our best every time we step on the court."
     },
     {
       name: "Fatma Jelassi",
       title: "Coach, Women's Youth Team",
-      image: pic2,
-      alt: "Portrait of Fatma Jelassi",
+      image: pic1,
       rating: 5,
       text: "Working with young talents and watching them grow under the guidance of the federation has been an incredible journey. We're building the future of Tunisian handball."
     },
     {
       name: "Oussama Trabelsi",
       title: "Handball Enthusiast",
-      image: pic3,
-      alt: "Portrait of Oussama Trabelsi",
+      image: pic1,
       rating: 4,
       text: "I’ve been a fan for years. The level of competition and organization has improved tremendously, and it’s inspiring to see our teams compete at the international level."
     }

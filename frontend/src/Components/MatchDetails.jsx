@@ -92,15 +92,15 @@ const MatchSheet = () => {
         <table className="min-w-full border-collapse border border-black">
           <tbody>
           <tr>
-              <td className="border p-2"><input type="text" name="nombre7m" value={matchDetails.nombre7m} onChange={handleChange} placeholder="Nombre de 7m" className="w-full p-1" /></td>
+              <td className="border p-2"><input type="text" name="nombre7m"  onChange={handleChange} placeholder="Nombre de 7m" className="w-full p-1" /></td>
               <td colSpan="3" className="border p-2 text-center font-bold">A</td>
-              <td className="border p-2"><input type="text" name="timeOut1" value={matchDetails.timeOut1} onChange={handleChange} placeholder="Team time-out 1" className="w-full p-1" /></td>
-              <td className="border p-2"><input type="text" name="timeOut1" value={matchDetails.timeOut1} onChange={handleChange} placeholder="Team time-out 2" className="w-full p-1" /></td>
+              <td className="border p-2"><input type="text" name="timeOut1"  onChange={handleChange} placeholder="Team time-out 1" className="w-full p-1" /></td>
+              <td className="border p-2"><input type="text" name="timeOut1"  onChange={handleChange} placeholder="Team time-out 2" className="w-full p-1" /></td>
               <td colSpan="2" className="border p-2 text-center">Noms et Prénoms des joueurs et des Officiels</td>
-              <td className="border p-2"><input type="text" name="timeOut1" value={matchDetails.timeOut1} onChange={handleChange} placeholder="Team time-out 1" className="w-full p-1" /></td>
-              <td className="border p-2"><input type="text" name="timeOut1" value={matchDetails.timeOut1} onChange={handleChange} placeholder="Team time-out 2" className="w-full p-1" /></td>
+              <td className="border p-2"><input type="text" name="timeOut1"  onChange={handleChange} placeholder="Team time-out 1" className="w-full p-1" /></td>
+              <td className="border p-2"><input type="text" name="timeOut1"  onChange={handleChange} placeholder="Team time-out 2" className="w-full p-1" /></td>
               <td colSpan="3" className="border p-2 text-center font-bold">B</td>
-              <td className="border p-2"><input type="text" name="nombre7m" value={matchDetails.nombre7m} onChange={handleChange} placeholder="Nombre de 7m" className="w-full p-1" /></td>
+              <td className="border p-2"><input type="text" name="nombre7m" onChange={handleChange} placeholder="Nombre de 7m" className="w-full p-1" /></td>
             </tr>
           </tbody>
         </table>
