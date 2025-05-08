@@ -61,7 +61,7 @@ DB_HOST= "localhost"
 DB_USER= "root"
 db_PASSWORD= "admin123"
 JWT_SECRET= "ed34df439zx"
-GOOGLE_API_KEY="AIzaSyBpHjDvAdqYoHx5Ggq3G3SZPKhLYGrPxK4"
+GOOGLE_API_KEY="add_your_api_google_flash_key"
 ```
 
 ## Folder Structure
