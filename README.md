@@ -4,12 +4,6 @@
 
 This project is designed to digitize the inefficient paper-based processes and optimize critical handball management processes, including player acquisition, match organization, and result recording. It features a web-based interface that enables stakeholders to manage clubs, validate player qualifications, organize matches, and generate match sheets automatically
 
-## Features
-
-- Feature 1: [Brief description]
-- Feature 2: [Brief description]
-- Feature 3: [Brief description]
-
 ## Tech Stack
 
 - **Frontend**: React, Vite
@@ -54,17 +48,6 @@ This project is designed to digitize the inefficient paper-based processes and o
     ```bash
     npm run dev
     ```
-
-## Usage
-
-To use Handball-ISS, follow these steps:
-1. [Step 1: Brief instruction]
-2. [Step 2: Brief instruction]
-3. [Step 3: Brief instruction]
-
-If applicable, refer to the following API endpoints:
-- `GET /api/example`: [Description]
-- `POST /api/example`: [Description]
 
 ## Environment Variables
 
