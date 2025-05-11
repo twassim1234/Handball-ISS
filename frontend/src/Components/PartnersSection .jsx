@@ -6,8 +6,10 @@ import pic3 from "../Assets/Sabrine.jpeg";
 import pic4 from "../Assets/STB.png";
 import pic5 from "../Assets/Agil.png";
 import pic6 from "../Assets/Promo.jpeg";
+import pic7 from "../Assets/tt.jpeg";
+import pic8 from "../Assets/vi.jpeg";
 
-const partners = [pic1, pic2, pic3, pic4, pic5, pic6];
+const partners = [pic1, pic2, pic3, pic4, pic5, pic6, pic7, pic8];
 
 const PartnersSection = () => {
   const [index, setIndex] = useState(0);
