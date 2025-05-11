@@ -50,7 +50,7 @@ export default function MatchPage() {
     <AuthenticationLayout requiresAuth allowedRoles={[1,2,3]}>
     {match?<div className="p-4 lg:p-22">
       <h1 className=" flex justify-center text-4xl font-bold mb-4">Match Details</h1>
-      <img src={getImageUrl()} alt={`${match.club1_name} vs ${match.club2_name}`} className=" w-full h-full flex items-center  object-cover rounded-b-4xl"  onError={(e) => {
+      <img src={getImageUrl()} alt={`${match.club1_name} vs ${match.club2_name}`} className="flex justify-around w-full px-4 rounded-4xl "  onError={(e) => {
               e.target.src = pic1; // Fallback to default image if error
             }}/>
 

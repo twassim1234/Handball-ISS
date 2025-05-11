@@ -97,10 +97,10 @@ const ListOfPlayers = ({
 
   return (
     <div>
-      <div className="flex justify-around mt-12">
+      <div className="flex justify-between w-full px-4">
         {/* Team A Table */}
         <div className="flex flex-col justify-start items-start">
-          <table className="w-2/5 border-collapse border">
+          <table className="w-5/5 border-collapse border">
             <thead>
               <tr>
                 <th
@@ -240,7 +240,7 @@ const ListOfPlayers = ({
           </table>
           <div className="flex justify-center items-center">
             <select
-              className="w-96 p-1 border rounded"
+              className="w-175 p-2 border mt-4"
               onChange={(e) => setClub1SelectedPlayer(e.target.value)}
             >
               <option value="">Select Player</option>
@@ -254,7 +254,7 @@ const ListOfPlayers = ({
                 ))}
             </select>
             <button
-              className="bg-blue-600 text-white p-2 rounded cursor-pointer"
+              className="w-29 bg-blue-600 text-white p-2 cursor-pointer mt-4 ml-1"
               onClick={() => handlePlayerAdd(club1_selected_player)}
             >
               Add Player
@@ -263,10 +263,10 @@ const ListOfPlayers = ({
         </div>
 
         {/* Sign Section between Teams */}
-        <div className="flex flex-col justify-center items-center w-1/5"></div>
+
         {/* Team B Table */}
         <div className="flex flex-col justify-start items-start">
-          <table className="w-2/5 border-collapse border">
+          <table className="w-5/5 border-collapse border">
             <thead>
               <tr>
                 <th
@@ -406,7 +406,7 @@ const ListOfPlayers = ({
           </table>
           <div className="flex justify-center items-center">
             <select
-              className="w-96 p-1 border rounded"
+              className="w-175 p-2 border mt-4"
               onChange={(e) => setClub2SelectedPlayer(e.target.value)}
             >
               <option value="">Select Player</option>
@@ -420,7 +420,7 @@ const ListOfPlayers = ({
                 ))}
             </select>
             <button
-              className="bg-blue-600 text-white p-2 rounded cursor-pointer"
+              className="w-29 bg-blue-600 text-white p-2 cursor-pointer mt-4 ml-1"
               onClick={() => handlePlayerAdd(club2_selected_player)}
             >
               Add Player
@@ -429,76 +429,97 @@ const ListOfPlayers = ({
         </div>
       </div>
 
-      {/* Additional tables for other players or sections */}
-      <div className="flex space-x-4">
-        {/*<table className="w-1/2 border-collapse border">
-          <tbody>
-            {[...Array(5)].map((_, index) => (
-              <tr key={index}>
-                <td className="border p-2 text-center">
-                  <input type="text" className="w-24.5 p-1 border rounded" />
-                </td>
-                <td className="border p-2 text-center">
-                  <input type="text" className="w-64 p-1 border rounded" />
-                </td>
-                <td className="border p-2 text-center">
-                  <input type="number" className="w-16 p-1 border rounded" />
-                </td>
-                <td className="border p-2 text-center">
-                  <input type="number" className="w-16 p-1 border rounded" />
-                </td>
-                <td className="border p-2 text-center">
-                  <input type="number" className="w-16 p-1 border rounded" />
-                </td>
-                <td className="border p-2 text-center">
-                  <input type="number" className="w-16 p-1 border rounded" />
-                </td>
+      {/* Table of officials A */}
+      <div className="flex justify-between w-full px-4 mt-8">
+        <div className="flex flex-col">
+          <table className="w-204 border-collapse border">
+          <tr className="bg-gray-200">
+                <th className="border p-2">OFFICIELS</th>
+                <th className="border p-2">COMMENTAIRES </th>
+                <th className="border p-2">A</th>
+                <th className="border p-2">CR</th>
+                <th className="border p-2">CB</th>
+                <th className="border p-2">2'</th>
               </tr>
-            ))}
-          </tbody>
-          <tr>
-            <th colSpan="8" className="bg-blue-600 text-white text-center py-2">
-              singuature
-            </th>
-          </tr>
-        </table> */}
-
-        {/* Sign Section between Teams */}
-        <div className="flex flex-col justify-center  w-1/2">
-          <div className="text-center text-lg p-4"></div>
+            <tbody>
+              {[...Array(5)].map((_, index) => (
+                <tr key={index}>
+                  <td className="border py-2 text-center">
+                    <input type="text" placeholder={`OFF ${String.fromCharCode(65 + index)}`} className="w-32 p-1 border rounded" />
+                  </td>
+                  <td className="border py-2 text-center">
+                    <input type="text" className="w-64 p-1 border rounded" />
+                  </td>
+                  <td className="border py-2 text-center">
+                    <input type="number" className="w-16 p-1 border rounded" />
+                  </td>
+                  <td className="border py-2 text-center">
+                    <input type="number" className="w-16 p-1 border rounded" />
+                  </td>
+                  <td className="border py-2 text-center">
+                    <input type="number" className="w-16 p-1 border rounded" />
+                  </td>
+                  <td className="border py-2 text-center">
+                    <input type="number" className="w-16 p-1 border rounded" />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <button
+            className="bg-blue-600 text-white text-center py-2 px-4 cursor-pointer mt-4"
+            onClick={() => console.log("Signature button clicked")}
+          >
+            Signature
+          </button>
         </div>
 
-        {/*<table className="w-1/2 border-collapse">
-          <tbody>
-            {[...Array(5)].map((_, index) => (
-              <tr key={index}>
-                <td className="border p-2 text-center">
-                  <input type="text" className="w-25 p-1 border rounded" />
-                </td>
-                <td className="border p-2 text-center">
-                  <input type="text" className="w-64 p-1 border rounded" />
-                </td>
-                <td className="border p-2 text-center">
-                  <input type="number" className="w-16 p-1 border rounded" />
-                </td>
-                <td className="border p-2 text-center">
-                  <input type="number" className="w-16 p-1 border rounded" />
-                </td>
-                <td className="border p-2 text-center">
-                  <input type="number" className="w-16 p-1 border rounded" />
-                </td>
-                <td className="border p-2 text-center">
-                  <input type="number" className="w-16 p-1 border rounded" />
-                </td>
+        {/* Table officials B */}
+        <div className="flex flex-col justify-center  w-1/2">
+        </div>
+
+        <div className="flex flex-col">
+          <table className="w-204 border-collapse border">
+            <tbody>
+            <tr className="bg-gray-200">
+                <th className="border p-2">OFFICIELS</th>
+                <th className="border p-2">COMMENTAIRES </th>
+                <th className="border p-2">A</th>
+                <th className="border p-2">CR</th>
+                <th className="border p-2">CB</th>
+                <th className="border p-2">2'</th>
               </tr>
-            ))}
-          </tbody>
-          <tr>
-            <th colSpan="8" className="bg-blue-600 text-white text-center py-2">
-              singuature
-            </th>
-          </tr>
-        </table>*/}
+              {[...Array(5)].map((_, index) => (
+                <tr key={index}>
+                  <td className="border py-2 text-center">
+                    <input type="text" placeholder={`OFF ${String.fromCharCode(65 + index)}`} className="w-32 p-1 border rounded" />
+                  </td>
+                  <td className="border py-2 text-center">
+                    <input type="text" className="w-64 p-1 border rounded" />
+                  </td>
+                  <td className="border py-2 text-center">
+                    <input type="number" className="w-16 p-1 border rounded" />
+                  </td>
+                  <td className="border py-2 text-center">
+                    <input type="number" className="w-16 p-1 border rounded" />
+                  </td>
+                  <td className="border py-2 text-center">
+                    <input type="number" className="w-16 p-1 border rounded" />
+                  </td>
+                  <td className="border py-2 text-center">
+                    <input type="number" className="w-16 p-1 border rounded" />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <button
+            className="bg-blue-600 text-white text-center py-2 px-4 cursor-pointer mt-4"
+            onClick={() => console.log("Signature button clicked")}
+          >
+            Signature
+          </button>
+        </div>
       </div>
     </div>
   );

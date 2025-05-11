@@ -1033,7 +1033,7 @@ router.post('/extract-pdf', uploads.single('file'), async (req, res) => {
     }
 
     // 2. Ask AI for a human-readable summary (like your example)
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
     const prompt = `
       Analyze this payment receipt and provide a **detailed summary** in this format:
 
