@@ -1,12 +1,12 @@
 import React from "react";
-import pic1 from "../Assets/s1.jpg";
+import pic1 from "../Assets/s1.jpeg";
 import pic2 from "../Assets/s2.png";
-import pic3 from "../Assets/s3.png";
-import pic4 from "../Assets/s4.jpg";
-import pic5 from "../Assets/s5.jpeg";
-import pic6 from "../Assets/s6.png";
-import pic7 from "../Assets/s7.jpg";
-import pic8 from "../Assets/s8.jpg";
+import pic3 from "../Assets/s3.jpeg";
+import pic4 from "../Assets/Kempa.jpg";
+import pic5 from "../Assets/Promo.jpeg";
+import pic6 from "../Assets/Tunisiar.png";
+import pic7 from "../Assets/Sabrine.jpeg";
+import pic8 from "../Assets/STB.png";
 import { Link } from "react-router-dom";
 
 const newsData = [
