@@ -2,14 +2,13 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import pic1 from "../Assets/Kempa.jpg";
 import pic2 from "../Assets/Tunisiar.png";
-import pic3 from "../Assets/Sabrine.jpeg";
 import pic4 from "../Assets/STB.png";
 import pic5 from "../Assets/Agil.png";
 import pic6 from "../Assets/Promo.jpeg";
 import pic7 from "../Assets/tt.jpeg";
 import pic8 from "../Assets/vi.jpeg";
 
-const partners = [pic1, pic2, pic3, pic4, pic5, pic6, pic7, pic8];
+const partners = [pic1, pic2, pic4, pic5, pic6, pic7, pic8];
 
 const PartnersSection = () => {
   const [index, setIndex] = useState(0);
@@ -44,7 +43,10 @@ const PartnersSection = () => {
           }}
         >
           {partners.concat(partners).map((image, i) => (
-            <div key={i} className="flex-shrink-0 w-1/5 flex justify-center items-center">
+            <div
+              key={i}
+              className="flex-shrink-0 w-1/5 flex justify-center items-center"
+            >
               <img
                 src={image}
                 alt={`Partner ${i + 1}`}
